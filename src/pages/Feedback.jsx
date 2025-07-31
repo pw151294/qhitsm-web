@@ -7,10 +7,10 @@ import { useLocation, useNavigate } from "react-router-dom";
 export default function Feedback() {
     const location = useLocation();
     useNavigate();
-// 解析tab参数
+    // 解析tab参数，默认改为 stats
     const tab = (() => {
         const m = location.search.match(/tab=(\w+)/);
-        return m ? m[1] : "quick";
+        return m ? m[1] : "stats";
     })();
 
     const [feedbacks, setFeedbacks] = useState([]);
@@ -18,9 +18,9 @@ export default function Feedback() {
     const [feedbackList, setFeedbackList] = useState([]);
     const [isStatsLoading, setIsStatsLoading] = useState(true);
 
-    const [page] = useState(1);
-    const [size] = useState(20);
-    const [, setTotal] = useState(0);
+    const [page, setPage] = useState(1);
+    const [size, setSize] = useState(10);
+    const [total, setTotal] = useState(0);
     const [filters, setFilters] = useState({
         type: "all",
         status: "all",
@@ -112,26 +112,35 @@ export default function Feedback() {
         setIsLoading(false);
     };
 
+    // 只要filters、page、size变化且在管理tab下就刷新
+    useEffect(() => {
+        if (tab === "management") {
+            loadFeedbacks();
+        }
+        // eslint-disable-next-line
+    }, [filters, tab, page, size]);
+
     // 页面内容
     return (
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 p-4 md:p-8">
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 p-4 md:p-8 rounded-none">
             <div className="max-w-7xl mx-auto">
                 <div className="mb-8">
-                    <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-2">
-                        反馈与建议收集系统
+                    <h1 className="text-3xl md:text-4xl font-bold text-black mb-2">
+                        {tab === "management" ? "反馈管理" : "反馈中心"}
                     </h1>
-                    <p className="text-gray-600 text-lg">倾听用户声音，持续改进产品</p>
                 </div>
                 <div className="mt-6">
-                    {tab === "quick" && (
-                        <QuickFeedback onSubmit={() => loadFeedbacks()}/>
-                    )}
                     {tab === "stats" && (
-                        <FeedbackStats
-                            feedbacks={feedbackList}
-                            isLoading={isStatsLoading}
-                            onRefresh={handleStatsRefresh}
-                        />
+                        <>
+                            <div className="mb-8">
+                                <QuickFeedback onSubmit={() => loadFeedbacks()} compact />
+                            </div>
+                            <FeedbackStats
+                                feedbacks={feedbackList}
+                                isLoading={isStatsLoading}
+                                onRefresh={handleStatsRefresh}
+                            />
+                        </>
                     )}
                     {tab === "management" && (
                         <FeedbackManagement
@@ -140,6 +149,11 @@ export default function Feedback() {
                             onRefresh={() => loadFeedbacks()}
                             filters={filters}
                             setFilters={setFilters}
+                            page={page}
+                            size={size}
+                            total={total}
+                            onPageChange={setPage}
+                            onSizeChange={setSize}
                         />
                     )}
                 </div>

@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import {motion} from "framer-motion";
 
-export default function QuickFeedback({onSubmit}) {
+export default function QuickFeedback({onSubmit, compact = false}) {
     const [feedbackContent, setFeedbackContent] = useState("");
     const [showDialog, setShowDialog] = useState(false);
     const [currentType, setCurrentType] = useState("");
@@ -87,14 +87,14 @@ export default function QuickFeedback({onSubmit}) {
     };
 
     return (
-        <div className="space-y-6">
+        <div className={compact ? "space-y-4" : "space-y-6"}>
             {/* 成功提示 */}
             {showSuccess && (
                 <motion.div
                     initial={{opacity: 0, y: -20}}
                     animate={{opacity: 1, y: 0}}
                     exit={{opacity: 0, y: -20}}
-                    className="bg-green-50 border border-green-200 rounded-lg p-4 flex items-center gap-3"
+                    className="bg-green-50 border border-green-200 p-4 flex items-center gap-3 rounded-none"
                 >
                     <CheckCircle className="w-5 h-5 text-green-600"/>
                     <span className="text-green-800">反馈提交成功！感谢您的宝贵意见。</span>
@@ -102,16 +102,19 @@ export default function QuickFeedback({onSubmit}) {
             )}
 
             {/* 反馈类型选择 */}
-            <Card className="bg-white/80 backdrop-blur-sm">
-                <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-xl">
-                        <MessageSquare className="w-6 h-6 text-green-600"/>
+            <Card className={`bg-white/80 backdrop-blur-sm ${compact ? "min-h-[120px] md:min-h-[100px]" : ""} rounded-none`}>
+                {/* 调整顶部和底部内边距，使上下间距更均衡 */}
+                <CardHeader className={compact ? "pt-3 pb-2" : "pt-6 pb-3"}>
+                    <CardTitle className={`flex items-center gap-2 ${compact ? "text-lg" : "text-xl"}`}>
+                        <MessageSquare className={`text-green-600 ${compact ? "w-5 h-5" : "w-6 h-6"}`}/>
                         快速反馈入口
                     </CardTitle>
-                    <p className="text-gray-600">选择反馈类型，我们会认真处理您的每一条意见</p>
+                    {!compact && (
+                        <p className="text-gray-600">选择反馈类型，我们会认真处理您的每一条意见</p>
+                    )}
                 </CardHeader>
-                <CardContent>
-                    <div className="grid gap-6 md:grid-cols-3">
+                <CardContent className={compact ? "pt-0 pb-3" : "pt-0 pb-4"}>
+                    <div className={`grid gap-4 ${compact ? "md:grid-cols-3" : "gap-6 md:grid-cols-3"}`}>
                         {feedbackTypes.map((item) => {
                             const IconComponent = item.icon;
                             return (
@@ -121,16 +124,18 @@ export default function QuickFeedback({onSubmit}) {
                                     whileTap={{scale: 0.98}}
                                 >
                                     <Card
-                                        className={`cursor-pointer transition-all duration-200 hover:shadow-lg ${item.bgColor} ${item.borderColor} border-2`}
+                                        className={`cursor-pointer transition-all duration-200 hover:shadow-lg ${item.bgColor} ${item.borderColor} border-2 ${compact ? "min-h-[90px] flex items-center justify-center" : ""} rounded-none`}
                                         onClick={() => handleTypeSelect(item.type)}
                                     >
-                                        <CardContent className="p-6 text-center">
+                                        <CardContent className={`text-center ${compact ? "p-3" : "p-6"}`}>
                                             <div
-                                                className={`w-16 h-16 mx-auto mb-4 rounded-full bg-white/80 flex items-center justify-center ${item.color}`}>
-                                                <IconComponent className="w-8 h-8"/>
+                                                className={`mx-auto mb-2 bg-white/80 flex items-center justify-center ${item.color} ${compact ? "w-10 h-10" : "w-16 h-16"} rounded-none`}>
+                                                <IconComponent className={compact ? "w-6 h-6" : "w-8 h-8"}/>
                                             </div>
-                                            <h3 className="font-semibold text-lg mb-2">{item.title}</h3>
-                                            <p className="text-sm text-gray-600">{item.description}</p>
+                                            <h3 className={`font-semibold ${compact ? "text-base mb-0" : "text-lg mb-2"}`}>{item.title}</h3>
+                                            {!compact && (
+                                                <p className="text-sm text-gray-600">{item.description}</p>
+                                            )}
                                         </CardContent>
                                     </Card>
                                 </motion.div>
@@ -142,7 +147,7 @@ export default function QuickFeedback({onSubmit}) {
 
             {/* 反馈对话框 */}
             <Dialog open={showDialog} onOpenChange={setShowDialog}>
-                <DialogContent className="max-w-2xl">
+                <DialogContent className="max-w-2xl rounded-none">
                     <DialogHeader>
                         <DialogTitle className="flex items-center gap-2">
                             {feedbackTypes.find(t => t.type === currentType)?.icon && (
@@ -163,11 +168,12 @@ export default function QuickFeedback({onSubmit}) {
                                 onChange={(e) => setFeedbackContent(e.target.value)}
                                 placeholder={`请详细描述您要反馈的${currentType}...`}
                                 rows={8}
-                                className="mt-2"
+                                className="mt-2 rounded-none"
                             />
                         </div>
 
-                        <div className="bg-gray-50 rounded-lg p-4">
+                        {/* 去除圆角：rounded-lg -> 无 */}
+                        <div className="bg-gray-50 p-4 rounded-none">
                             <h4 className="font-medium mb-2">提示：</h4>
                             <ul className="text-sm text-gray-600 space-y-1">
                                 {currentType === "内容纠错" && (
@@ -195,13 +201,19 @@ export default function QuickFeedback({onSubmit}) {
                         </div>
 
                         <div className="flex justify-end gap-2">
-                            <Button variant="outline" onClick={() => setShowDialog(false)}>
+                            {/* 取消按钮：hover字体色 #478bff */}
+                            <Button
+                                variant="outline"
+                                onClick={() => setShowDialog(false)}
+                                className="hover:text-[#478bff]"
+                            >
                                 取消
                             </Button>
+                            {/* 提交按钮：背景色 #1f69ff，hover不变 */}
                             <Button
                                 onClick={handleSubmitFeedback}
                                 disabled={!feedbackContent.trim() || isSubmitting}
-                                className="bg-green-600 hover:bg-green-700"
+                                className="bg-[#1f69ff] hover:bg-[#1f69ff] text-white"
                             >
                                 {isSubmitting ? "提交中..." : "提交反馈"}
                             </Button>

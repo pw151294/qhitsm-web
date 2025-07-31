@@ -41,12 +41,7 @@ const navigationItems = [
     url: createPageUrl("Feedback"),
     children: [
       {
-        title: "快速反馈",
-        url: "/Feedback?tab=quick",
-        tab: "quick",
-      },
-      {
-        title: "反馈统计",
+        title: "反馈中心",
         url: "/Feedback?tab=stats",
         tab: "stats",
       },
