@@ -2,15 +2,14 @@ import React, { useEffect, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import UserGrowth from "../components/community/UserGrowth";
 import Leaderboard from "../components/community/Leaderboard";
-import InstantMessaging from "../components/community/InstantMessaging";
+// import InstantMessaging from "../components/community/InstantMessaging";
 import MaintenanceCalendar from "../components/community/MaintenanceCalendar";
 import { Event, User } from "@/api/entities";
 
 export default function Community() {
     const location = useLocation();
-    const navigate = useNavigate();
-
-    // 解析tab参数
+    useNavigate();
+// 解析tab参数
     const tab = (() => {
         const m = location.search.match(/tab=(\w+)/);
         return m ? m[1] : "growth";
@@ -68,7 +67,7 @@ export default function Community() {
         <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 p-4 md:p-8">
             <div className="max-w-7xl mx-auto">
                 <div className="mb-8">
-                    <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-2">
+                    <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent mb-2">
                         社区化运营支撑功能
                     </h1>
                     <p className="text-gray-600 text-lg">构建活跃社区，促进用户交流与成长</p>
@@ -80,9 +79,9 @@ export default function Community() {
                     {tab === "leaderboard" && (
                         <Leaderboard users={users} isLoading={isLoading} />
                     )}
-                    {tab === "messaging" && (
+                    {/* {tab === "messaging" && (
                         <InstantMessaging />
-                    )}
+                    )} */}
                     {tab === "calendar" && (
                         <MaintenanceCalendar
                             events={events}

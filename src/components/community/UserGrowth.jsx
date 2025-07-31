@@ -96,7 +96,7 @@ export default function UserGrowth({ users, isLoading }) {
   return (
     <div className="space-y-6">
       {/* 用户成长概览 */}
-      <Card className="bg-gradient-to-r from-purple-50 to-pink-50 border-purple-200">
+      <Card className="bg-white rounded-xl shadow-md p-6 mb-6">
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-xl">
             <TrendingUp className="w-6 h-6 text-purple-600" />
