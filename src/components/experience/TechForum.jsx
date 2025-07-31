@@ -121,6 +121,31 @@ export default function TechForum({
         }
     };
 
+    // 新增：详情弹窗相关状态
+    const [detailDialogOpen, setDetailDialogOpen] = useState(false);
+    const [detailLoading, setDetailLoading] = useState(false);
+    const [detailData, setDetailData] = useState(null);
+
+    // 新增：查看详情处理函数
+    const handleViewDetail = async (postId) => {
+        setDetailDialogOpen(true);
+        setDetailLoading(true);
+        setDetailData(null);
+        try {
+            const res = await fetch(`/api/forum/posts/${postId}`);
+            const json = await res.json();
+            if (json.code === 200) {
+                setDetailData(json.data);
+            } else {
+                setDetailData({error: "获取详情失败"});
+            }
+        } catch (e) {
+            setDetailData({error: "网络错误"});
+        } finally {
+            setDetailLoading(false);
+        }
+    };
+
     return (
         <div className="space-y-6">
             {/* 分类导航 */}
@@ -348,8 +373,13 @@ export default function TechForum({
                                                     />
                                                     {post.replies_count || 0}
                                                 </div>
-                                                <Button variant="outline" size="sm">
-                                                    查看详情
+                                                <Button
+                                                    variant="outline"
+                                                    size="sm"
+                                                    onClick={() => handleViewDetail(post.id)}
+                                                    disabled={detailLoading && detailDialogOpen}
+                                                >
+                                                    {detailLoading && detailDialogOpen ? "加载中..." : "查看详情"}
                                                 </Button>
                                             </div>
                                         </div>
@@ -381,6 +411,116 @@ export default function TechForum({
                                 {replyLoading ? "提交中..." : "提交回复"}
                             </Button>
                         </div>
+                    </div>
+                </DialogContent>
+            </Dialog>
+
+            {/* 新增：详情弹窗 */}
+            <Dialog open={detailDialogOpen} onOpenChange={(open) => {
+                setDetailDialogOpen(open);
+                if (!open) setDetailData(null);
+            }}>
+                <DialogContent className="max-w-3xl p-0 overflow-hidden">
+                    <div className="bg-gradient-to-br from-blue-50 via-white to-gray-50 rounded-lg shadow-lg">
+                        <DialogHeader className="px-6 pt-6 pb-2">
+                            <DialogTitle className="flex items-center gap-3 text-2xl font-bold text-blue-800">
+                                {detailLoading ? (
+                                    <span className="text-base text-gray-400">加载中...</span>
+                                ) : detailData?.error ? (
+                                    <span className="text-base text-red-500">{detailData.error}</span>
+                                ) : (
+                                    <>
+                                        {detailData?.is_pinned && (
+                                            <Pin className="w-6 h-6 text-red-500"/>
+                                        )}
+                                        {detailData?.is_featured && (
+                                            <Star className="w-6 h-6 text-orange-500"/>
+                                        )}
+                                        {detailData?.title}
+                                    </>
+                                )}
+                            </DialogTitle>
+                        </DialogHeader>
+                        {!detailLoading && detailData && !detailData.error && (
+                            <div className="px-6 pb-6">
+                                {/* 作者与分类 */}
+                                <div className="flex items-center gap-4 mb-4">
+                                    <img
+                                        src={detailData.author_info?.avatar_url}
+                                        alt="avatar"
+                                        className="w-12 h-12 rounded-full border border-blue-200 object-cover"
+                                    />
+                                    <div>
+                                        <div className="font-semibold text-blue-900">{detailData.author_info?.full_name}</div>
+                                        <div className="text-xs text-gray-500 flex items-center gap-2">
+                                            Lv.{detailData.author_info?.level}
+                                            {detailData.author_info?.certification && (
+                                                <span className="bg-blue-100 text-blue-700 px-2 py-0.5 rounded ml-1">{detailData.author_info.certification}</span>
+                                            )}
+                                        </div>
+                                    </div>
+                                    <div className="ml-auto flex gap-2">
+                                        <Badge variant="outline" className={getCategoryColor(detailData.category)}>
+                                            {detailData.category}
+                                        </Badge>
+                                        {detailData.reward_points > 0 && (
+                                            <Badge className="bg-yellow-100 text-yellow-800">
+                                                <Award className="w-3 h-3 mr-1"/>
+                                                {detailData.reward_points}积分
+                                            </Badge>
+                                        )}
+                                        {detailData.is_featured && (
+                                            <Badge className="bg-orange-100 text-orange-800">
+                                                <Star className="w-3 h-3 mr-1"/>
+                                                精华
+                                            </Badge>
+                                        )}
+                                    </div>
+                                </div>
+                                {/* 内容 */}
+                                <div className="bg-white rounded p-4 mb-4 border border-gray-100">
+                                    <div className="text-gray-900 text-base whitespace-pre-line">{detailData.content}</div>
+                                </div>
+                                {/* 统计信息 */}
+                                <div className="flex gap-6 text-gray-500 text-sm mb-4">
+                                    <div className="flex items-center gap-1">
+                                        <Eye className="w-4 h-4"/>
+                                        {detailData.views_count} 浏览
+                                    </div>
+                                    <div className="flex items-center gap-1">
+                                        <MessageCircle className="w-4 h-4"/>
+                                        {detailData.replies_count} 回复
+                                    </div>
+                                    <div className="flex items-center gap-1">
+                                        <Star className="w-4 h-4"/>
+                                        {detailData.likes_count} 点赞
+                                    </div>
+                                    <div className="flex items-center gap-1">
+                                        <Calendar className="w-4 h-4"/>
+                                        {format(new Date(detailData.created_date), 'yyyy-MM-dd HH:mm', {locale: zhCN})}
+                                    </div>
+                                </div>
+                                {/* 回复列表 */}
+                                <div>
+                                    <div className="font-semibold text-gray-700 mb-2">回复</div>
+                                    {detailData.replies && detailData.replies.length > 0 ? (
+                                        <div className="space-y-3 max-h-48 overflow-y-auto pr-2">
+                                            {detailData.replies.map(reply => (
+                                                <div key={reply.id} className="bg-gray-50 rounded p-3 border border-gray-100">
+                                                    <div className="text-gray-800 text-sm">{reply.content}</div>
+                                                    <div className="text-xs text-gray-400 mt-1 flex items-center gap-2">
+                                                        <MessageCircle className="w-3 h-3"/>
+                                                        {reply.likes_count} 赞
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    ) : (
+                                        <div className="text-gray-400 text-sm">暂无回复</div>
+                                    )}
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </DialogContent>
             </Dialog>
