@@ -93,12 +93,19 @@ export default function Layout({ children }) {
   const [fbOpen, setFbOpen] = useState(() =>
     location.pathname.startsWith("/Feedback")
   );
+  // 折叠状态：社区化运营支撑菜单
+  const [communityOpen, setCommunityOpen] = useState(() =>
+    location.pathname.startsWith("/Community")
+  );
   // 移动端折叠
   const [expOpenMobile, setExpOpenMobile] = useState(() =>
     location.pathname.startsWith("/Experience")
   );
   const [fbOpenMobile, setFbOpenMobile] = useState(() =>
     location.pathname.startsWith("/Feedback")
+  );
+  const [communityOpenMobile, setCommunityOpenMobile] = useState(() =>
+    location.pathname.startsWith("/Community")
   );
 
   React.useEffect(() => {
@@ -163,15 +170,17 @@ export default function Layout({ children }) {
       {/* 经验分享与案例学习（带折叠） */}
       <div>
         <button
-          className={`flex items-center w-full px-4 py-3 rounded-lg transition-all duration-200
+          className={`group flex items-center w-full px-4 py-3 rounded-lg transition-all duration-200
             ${
-              (isExperienceActive && currentTab) // 有子菜单被选中
-                ? 'bg-white text-gray-900'
-                : isExperienceActive
-                  ? 'bg-blue-100 text-blue-700'
-                  : 'text-gray-700 hover:text-blue-700 hover:bg-blue-50'
+              isExperienceActive
+                ? 'text-gray-900'
+                : 'text-gray-700'
             }`}
-          style={{ fontWeight: 400, fontSize: "1rem" }}
+          style={{
+            fontWeight: 400,
+            fontSize: "1rem"
+          }}
+          // 移除 onMouseEnter/onMouseLeave 以取消 hover 背景
           onClick={() => isMobile ? setExpOpenMobile(v => !v) : setExpOpen(v => !v)}
         >
           <span className="truncate">经验分享与案例学习</span>
@@ -194,8 +203,8 @@ export default function Layout({ children }) {
               onClick={onClickNav}
               className={`block py-2 px-4 w-full rounded-lg transition-all duration-200
                 ${isExperienceActive && currentTab === child.tab
-                  ? 'bg-blue-500 text-white'
-                  : 'text-gray-600 hover:text-blue-700 hover:bg-blue-50'
+                  ? 'bg-[color:var(--blue-6)] text-white'
+                  : 'text-gray-600'
                 }`}
               style={{
                 fontWeight: 400,
@@ -203,6 +212,7 @@ export default function Layout({ children }) {
                 textAlign: "left",
                 paddingLeft: "2.5rem"
               }}
+              // 移除 onMouseEnter/onMouseLeave 以取消 hover 背景
             >
               {child.title}
             </Link>
@@ -212,15 +222,17 @@ export default function Layout({ children }) {
       {/* 反馈与建议收集（带折叠） */}
       <div>
         <button
-          className={`flex items-center w-full px-4 py-3 rounded-lg transition-all duration-200
+          className={`group flex items-center w-full px-4 py-3 rounded-lg transition-all duration-200
             ${
-              (isFeedbackActive && currentFeedbackTab)
-                ? 'bg-white text-gray-900'
-                : isFeedbackActive
-                  ? 'bg-blue-100 text-blue-700'
-                  : 'text-gray-700 hover:text-blue-700 hover:bg-blue-50'
+              isFeedbackActive
+                ? 'text-gray-900'
+                : 'text-gray-700'
             }`}
-          style={{ fontWeight: 400, fontSize: "1rem" }}
+          style={{
+            fontWeight: 400,
+            fontSize: "1rem"
+          }}
+          // 移除 onMouseEnter/onMouseLeave 以取消 hover 背景
           onClick={() => isMobile ? setFbOpenMobile(v => !v) : setFbOpen(v => !v)}
         >
           <span className="truncate">反馈与建议收集</span>
@@ -243,8 +255,8 @@ export default function Layout({ children }) {
               onClick={onClickNav}
               className={`block py-2 px-4 w-full rounded-lg transition-all duration-200
                 ${isFeedbackActive && currentFeedbackTab === child.tab
-                  ? 'bg-blue-500 text-white'
-                  : 'text-gray-600 hover:text-blue-700 hover:bg-blue-50'
+                  ? 'bg-[color:var(--blue-6)] text-white'
+                  : 'text-gray-600'
                 }`}
               style={{
                 fontWeight: 400,
@@ -252,6 +264,7 @@ export default function Layout({ children }) {
                 textAlign: "left",
                 paddingLeft: "2.5rem"
               }}
+              // 移除 onMouseEnter/onMouseLeave 以取消 hover 背景
             >
               {child.title}
             </Link>
@@ -261,27 +274,29 @@ export default function Layout({ children }) {
       {/* 社区化运营支撑（带折叠） */}
       <div>
         <button
-          className={`flex items-center w-full px-4 py-3 rounded-lg transition-all duration-200
+          className={`group flex items-center w-full px-4 py-3 rounded-lg transition-all duration-200
             ${
-              (isCommunityActive && currentCommunityTab)
-                ? 'bg-white text-gray-900'
-                : isCommunityActive
-                  ? 'bg-blue-100 text-blue-700'
-                  : 'text-gray-700 hover:text-blue-700 hover:bg-blue-50'
+              isCommunityActive
+                ? 'text-gray-900'
+                : 'text-gray-700'
             }`}
-          style={{ fontWeight: 400, fontSize: "1rem" }}
-          onClick={() => isMobile ? setFbOpenMobile(v => !v) : setFbOpen(v => !v)}
+          style={{
+            fontWeight: 400,
+            fontSize: "1rem"
+          }}
+          // 移除 onMouseEnter/onMouseLeave 以取消 hover 背景
+          onClick={() => isMobile ? setCommunityOpenMobile(v => !v) : setCommunityOpen(v => !v)}
         >
           <span className="truncate">社区化运营支撑</span>
-          {(isMobile ? fbOpenMobile : fbOpen)
+          {(isMobile ? communityOpenMobile : communityOpen)
             ? <ChevronDown className="ml-auto w-4 h-4" />
             : <ChevronRight className="ml-auto w-4 h-4" />}
         </button>
         <div
           className={`transition-all overflow-hidden
             ${isMobile
-              ? fbOpenMobile ? "max-h-56 opacity-100" : "max-h-0 opacity-0"
-              : fbOpen ? "max-h-56 opacity-100" : "max-h-0 opacity-0"
+              ? communityOpenMobile ? "max-h-56 opacity-100" : "max-h-0 opacity-0"
+              : communityOpen ? "max-h-56 opacity-100" : "max-h-0 opacity-0"
             }`}
           style={{ transition: "all 0.2s" }}
         >
@@ -292,8 +307,8 @@ export default function Layout({ children }) {
               onClick={onClickNav}
               className={`block py-2 px-4 w-full rounded-lg transition-all duration-200
                 ${isCommunityActive && currentCommunityTab === child.tab
-                  ? 'bg-blue-500 text-white'
-                  : 'text-gray-600 hover:text-blue-700 hover:bg-blue-50'
+                  ? 'bg-[color:var(--blue-6)] text-white'
+                  : 'text-gray-600'
                 }`}
               style={{
                 fontWeight: 400,
@@ -301,6 +316,7 @@ export default function Layout({ children }) {
                 textAlign: "left",
                 paddingLeft: "2.5rem"
               }}
+              // 移除 onMouseEnter/onMouseLeave 以取消 hover 背景
             >
               {child.title}
             </Link>
@@ -311,9 +327,18 @@ export default function Layout({ children }) {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 flex">
+    <div
+      className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 flex"
+      style={{
+        "--blue-1": "#ebf5ff",
+        "--blue-3": "#99c5ff",
+        "--blue-6": "#1f69ff",
+        "--blue-7": "#0f4cd9",
+        "--text-regular": "#595959"
+      }}
+    >
       {/* 左侧侧边栏 */}
-      <aside className="hidden lg:flex flex-col w-64 bg-white/90 backdrop-blur-sm border-r shadow-sm min-h-screen">
+      <aside className="hidden lg:flex flex-col w-64 bg-[color:var(--blue-3)]/90 backdrop-blur-sm border-r shadow-sm min-h-screen">
         {/* Logo区域 */}
         <div className="flex items-center gap-3 px-6 py-6 border-b">
           <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl flex items-center justify-center">
@@ -356,7 +381,15 @@ export default function Layout({ children }) {
 
       {/* 移动端顶部栏 */}
       <div className="lg:hidden w-full">
-        <header className="bg-white/80 backdrop-blur-sm shadow-sm border-b sticky top-0 z-50">
+        <header
+          className="bg-[color:var(--blue-3)]/80 backdrop-blur-sm shadow-sm border-b sticky top-0 z-50"
+          style={{
+            "--blue-1": "#ebf5ff",
+            "--blue-3": "#99c5ff",
+            "--blue-6": "#1f69ff",
+            "--blue-7": "#0f4cd9"
+          }}
+        >
           <div className="flex items-center justify-between px-4 py-3">
             {/* Logo */}
             <div className="flex items-center gap-2">

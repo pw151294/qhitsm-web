@@ -171,181 +171,159 @@ export default function CaseLibrary() {
     return (
         <div className="space-y-6">
             {/* 筛选条件 */}
-            <Card className="bg-white/80 backdrop-blur-sm">
-                <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-lg">
-                        <Filter className="w-5 h-5 text-blue-600"/>
-                        筛选条件
-                    </CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-                        <div>
-                            <Label>故障类型</Label>
-                            <Select
-                                value={filters.fault_type}
-                                onValueChange={(value) => setFilters({...filters, fault_type: value})}
-                            >
-                                <SelectTrigger>
-                                    <SelectValue placeholder="选择类型"/>
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="all">全部类型</SelectItem>
-                                    <SelectItem value="网络故障">网络故障</SelectItem>
-                                    <SelectItem value="数据丢失">数据丢失</SelectItem>
-                                    <SelectItem value="系统崩溃">系统崩溃</SelectItem>
-                                    <SelectItem value="性能问题">性能问题</SelectItem>
-                                    <SelectItem value="安全问题">安全问题</SelectItem>
-                                </SelectContent>
-                            </Select>
+            <div className="flex flex-col md:flex-row justify-center items-center gap-4 py-2">
+                <Select
+                    value={filters.fault_type}
+                    onValueChange={(value) => setFilters({...filters, fault_type: value})}
+                >
+                    <SelectTrigger>
+                        <SelectValue placeholder="选择类型"/>
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="all">全部类型</SelectItem>
+                        <SelectItem value="网络故障">网络故障</SelectItem>
+                        <SelectItem value="数据丢失">数据丢失</SelectItem>
+                        <SelectItem value="系统崩溃">系统崩溃</SelectItem>
+                        <SelectItem value="性能问题">性能问题</SelectItem>
+                        <SelectItem value="安全问题">安全问题</SelectItem>
+                    </SelectContent>
+                </Select>
+                <Select
+                    value={filters.time_range}
+                    onValueChange={(value) => setFilters({...filters, time_range: value})}
+                >
+                    <SelectTrigger>
+                        <SelectValue placeholder="选择时间"/>
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="all">全部时间</SelectItem>
+                        <SelectItem value="7">近7天</SelectItem>
+                        <SelectItem value="30">近30天</SelectItem>
+                        <SelectItem value="90">近3个月</SelectItem>
+                    </SelectContent>
+                </Select>
+                <Input
+                    type="number"
+                    placeholder="最少点赞数"
+                    value={filters.likes_min}
+                    onChange={(e) => setFilters({...filters, likes_min: e.target.value})}
+                />
+                <Input
+                    type="text"
+                    placeholder="输入关键词"
+                    value={filters.keyword}
+                    onChange={(e) => setFilters({...filters, keyword: e.target.value})}
+                />
+                <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
+                    <DialogTrigger asChild>
+                        <Button className="bg-blue-600 hover:bg-blue-700">
+                            <Plus className="w-4 h-4 mr-2"/>
+                            发布案例
+                        </Button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto rounded-none">
+                        <DialogHeader>
+                            <DialogTitle>发布新案例</DialogTitle>
+                        </DialogHeader>
+                        <div className="space-y-4">
+                            <div>
+                                <Label>案例标题</Label>
+                                <Input
+                                    value={newCase.title}
+                                    onChange={(e) => setNewCase({...newCase, title: e.target.value})}
+                                    placeholder="输入案例标题"
+                                />
+                            </div>
+                            <div>
+                                <Label>故障类型</Label>
+                                <Select
+                                    value={newCase.fault_type}
+                                    onValueChange={(value) => setNewCase({...newCase, fault_type: value})}
+                                >
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="选择故障类型"/>
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="网络故障">网络故障</SelectItem>
+                                        <SelectItem value="数据丢失">数据丢失</SelectItem>
+                                        <SelectItem value="系统崩溃">系统崩溃</SelectItem>
+                                        <SelectItem value="性能问题">性能问题</SelectItem>
+                                        <SelectItem value="安全问题">安全问题</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <div>
+                                <Label>故障现象</Label>
+                                <Textarea
+                                    value={newCase.fault_phenomenon}
+                                    onChange={(e) => setNewCase({
+                                        ...newCase,
+                                        fault_phenomenon: e.target.value
+                                    })}
+                                    placeholder="描述故障现象"
+                                    rows={3}
+                                />
+                            </div>
+                            <div>
+                                <Label>原因分析</Label>
+                                <Textarea
+                                    value={newCase.cause_analysis}
+                                    onChange={(e) => setNewCase({
+                                        ...newCase,
+                                        cause_analysis: e.target.value
+                                    })}
+                                    placeholder="分析故障原因"
+                                    rows={3}
+                                />
+                            </div>
+                            <div>
+                                <Label>解决步骤</Label>
+                                <Textarea
+                                    value={newCase.solution_steps}
+                                    onChange={(e) => setNewCase({
+                                        ...newCase,
+                                        solution_steps: e.target.value
+                                    })}
+                                    placeholder="详细的解决步骤"
+                                    rows={4}
+                                />
+                            </div>
+                            <div>
+                                <Label>预防措施</Label>
+                                <Textarea
+                                    value={newCase.prevention_measures}
+                                    onChange={(e) => setNewCase({
+                                        ...newCase,
+                                        prevention_measures: e.target.value
+                                    })}
+                                    placeholder="预防此类问题的措施"
+                                    rows={3}
+                                />
+                            </div>
+                            <div className="flex justify-end gap-2">
+                                <Button
+                                    variant="outline"
+                                    onClick={() => setShowCreateDialog(false)}
+                                    className="hover:text-[#478bff]"
+                                >
+                                    取消
+                                </Button>
+                                <Button
+                                    onClick={handleCreateCase}
+                                    className="bg-[#1f69ff] hover:bg-[#1f69ff]"
+                                >
+                                    发布案例
+                                </Button>
+                            </div>
                         </div>
-
-                        <div>
-                            <Label>发布时间</Label>
-                            <Select
-                                value={filters.time_range}
-                                onValueChange={(value) => setFilters({...filters, time_range: value})}
-                            >
-                                <SelectTrigger>
-                                    <SelectValue placeholder="选择时间"/>
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="all">全部时间</SelectItem>
-                                    <SelectItem value="7">近7天</SelectItem>
-                                    <SelectItem value="30">近30天</SelectItem>
-                                    <SelectItem value="90">近3个月</SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </div>
-
-                        <div>
-                            <Label>最少点赞数</Label>
-                            <Input
-                                type="number"
-                                placeholder="输入数字"
-                                value={filters.likes_min}
-                                onChange={(e) => setFilters({...filters, likes_min: e.target.value})}
-                            />
-                        </div>
-
-                        <div>
-                            <Label>关键词</Label>
-                            <Input
-                                type="text"
-                                placeholder="输入关键词"
-                                value={filters.keyword}
-                                onChange={(e) => setFilters({...filters, keyword: e.target.value})}
-                            />
-                        </div>
-
-                        <div className="flex items-end">
-                            <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
-                                <DialogTrigger asChild>
-                                    <Button className="w-full bg-blue-600 hover:bg-blue-700">
-                                        <Plus className="w-4 h-4 mr-2"/>
-                                        发布案例
-                                    </Button>
-                                </DialogTrigger>
-                                <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
-                                    <DialogHeader>
-                                        <DialogTitle>发布新案例</DialogTitle>
-                                    </DialogHeader>
-                                    <div className="space-y-4">
-                                        <div>
-                                            <Label>案例标题</Label>
-                                            <Input
-                                                value={newCase.title}
-                                                onChange={(e) => setNewCase({...newCase, title: e.target.value})}
-                                                placeholder="输入案例标题"
-                                            />
-                                        </div>
-                                        <div>
-                                            <Label>故障类型</Label>
-                                            <Select
-                                                value={newCase.fault_type}
-                                                onValueChange={(value) => setNewCase({...newCase, fault_type: value})}
-                                            >
-                                                <SelectTrigger>
-                                                    <SelectValue placeholder="选择故障类型"/>
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    <SelectItem value="网络故障">网络故障</SelectItem>
-                                                    <SelectItem value="数据丢失">数据丢失</SelectItem>
-                                                    <SelectItem value="系统崩溃">系统崩溃</SelectItem>
-                                                    <SelectItem value="性能问题">性能问题</SelectItem>
-                                                    <SelectItem value="安全问题">安全问题</SelectItem>
-                                                </SelectContent>
-                                            </Select>
-                                        </div>
-                                        <div>
-                                            <Label>故障现象</Label>
-                                            <Textarea
-                                                value={newCase.fault_phenomenon}
-                                                onChange={(e) => setNewCase({
-                                                    ...newCase,
-                                                    fault_phenomenon: e.target.value
-                                                })}
-                                                placeholder="描述故障现象"
-                                                rows={3}
-                                            />
-                                        </div>
-                                        <div>
-                                            <Label>原因分析</Label>
-                                            <Textarea
-                                                value={newCase.cause_analysis}
-                                                onChange={(e) => setNewCase({
-                                                    ...newCase,
-                                                    cause_analysis: e.target.value
-                                                })}
-                                                placeholder="分析故障原因"
-                                                rows={3}
-                                            />
-                                        </div>
-                                        <div>
-                                            <Label>解决步骤</Label>
-                                            <Textarea
-                                                value={newCase.solution_steps}
-                                                onChange={(e) => setNewCase({
-                                                    ...newCase,
-                                                    solution_steps: e.target.value
-                                                })}
-                                                placeholder="详细的解决步骤"
-                                                rows={4}
-                                            />
-                                        </div>
-                                        <div>
-                                            <Label>预防措施</Label>
-                                            <Textarea
-                                                value={newCase.prevention_measures}
-                                                onChange={(e) => setNewCase({
-                                                    ...newCase,
-                                                    prevention_measures: e.target.value
-                                                })}
-                                                placeholder="预防此类问题的措施"
-                                                rows={3}
-                                            />
-                                        </div>
-                                        <div className="flex justify-end gap-2">
-                                            <Button variant="outline" onClick={() => setShowCreateDialog(false)}>
-                                                取消
-                                            </Button>
-                                            <Button onClick={handleCreateCase}>
-                                                发布案例
-                                            </Button>
-                                        </div>
-                                    </div>
-                                </DialogContent>
-                            </Dialog>
-                        </div>
-                    </div>
-                </CardContent>
-            </Card>
-
+                    </DialogContent>
+                </Dialog>
+            </div>
             {/* 案例列表 */}
-            <div className="grid gap-6">
+            <div className="grid gap-6 grid-cols-1 md:grid-cols-3">
                 {isLoading ? (
                     Array(6).fill(0).map((_, i) => (
-                        <Card key={i} className="bg-white/80 backdrop-blur-sm">
+                        <Card key={i} className="bg-white/80 backdrop-blur-sm rounded-none">
                             <CardHeader>
                                 <Skeleton className="h-6 w-3/4"/>
                                 <div className="flex gap-2">
@@ -362,12 +340,15 @@ export default function CaseLibrary() {
                 ) : (
                     cases.map((caseItem) => (
                         <Card key={caseItem.id}
-                              className="bg-white/80 backdrop-blur-sm hover:shadow-lg transition-all duration-300">
+                              className="bg-white/80 backdrop-blur-sm hover:shadow-lg transition-all duration-300 flex flex-col rounded-none">
                             <CardHeader>
-                                <div className="flex justify-between items-start">
-                                    <div>
-                                        <CardTitle className="text-lg mb-2">{caseItem.title}</CardTitle>
-                                        <div className="flex gap-2 flex-wrap">
+                                <div className="relative">
+                                    {/* 调整右侧padding，减少标题和标签与右上角作者日期的空白距离 */}
+                                    <div className="pr-20">
+                                        <CardTitle className="text-lg mb-2 break-words whitespace-pre-line">
+                                            {caseItem.title}
+                                        </CardTitle>
+                                        <div className="flex gap-2 flex-wrap mb-1">
                                             <Badge variant="outline"
                                                    className="bg-blue-50 text-blue-700 border-blue-200">
                                                 <Tag className="w-3 h-3 mr-1"/>
@@ -380,7 +361,8 @@ export default function CaseLibrary() {
                                             ))}
                                         </div>
                                     </div>
-                                    <div className="flex items-center gap-4 text-sm text-gray-500">
+                                    {/* 用户和日期右上角绝对定位 */}
+                                    <div className="absolute top-0 right-0 flex flex-col items-end gap-1 text-sm text-gray-500">
                                         <div className="flex items-center gap-1">
                                             <User className="w-4 h-4"/>
                                             {caseItem.created_by?.split('@')[0] || '匿名用户'}
@@ -392,50 +374,53 @@ export default function CaseLibrary() {
                                     </div>
                                 </div>
                             </CardHeader>
-                            <CardContent>
-                                <p className="text-gray-600 mb-4 line-clamp-2">{caseItem.fault_phenomenon}</p>
-
-                                <div className="flex justify-between items-center">
-                                    <div className="flex gap-4 text-sm text-gray-500">
-                                        <div className="flex items-center gap-1">
-                                            <Eye className="w-4 h-4"/>
-                                            {caseItem.views_count || 0}
+                            <CardContent className="flex-1 flex flex-col">
+                                {/* 调整字体和间距 */}
+                                <p className="text-xs text-gray-600 mb-2 line-clamp-2">{caseItem.fault_phenomenon}</p>
+                                {/* 统一底部：所有图标和按钮绝对底部对齐 */}
+                                <div className="mt-auto w-full">
+                                    <div className="flex flex-wrap justify-between items-center gap-2">
+                                        <div className="flex gap-4 text-sm text-gray-500">
+                                            <div className="flex items-center gap-1">
+                                                <Eye className="w-4 h-4"/>
+                                                {caseItem.views_count || 0}
+                                            </div>
+                                            <div className="flex items-center gap-1">
+                                                <Heart className="w-4 h-4"/>
+                                                {caseItem.likes_count || 0}
+                                            </div>
+                                            <div className="flex items-center gap-1">
+                                                <MessageCircle className="w-4 h-4"/>
+                                                {caseItem.comments_count || 0}
+                                            </div>
+                                            <div className="flex items-center gap-1">
+                                                <Bookmark className="w-4 h-4"/>
+                                                {caseItem.favorites_count || 0}
+                                            </div>
                                         </div>
-                                        <div className="flex items-center gap-1">
-                                            <Heart className="w-4 h-4"/>
-                                            {caseItem.likes_count || 0}
+                                        <div className="flex gap-2">
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                onClick={() => handleShowDetail(caseItem.id)}
+                                            >
+                                                查看详情
+                                            </Button>
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                onClick={() => handleLike(caseItem.id)}
+                                            >
+                                                <Heart className="w-4 h-4"/>
+                                            </Button>
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                onClick={() => handleFavorite(caseItem.id)}
+                                            >
+                                                <Bookmark className="w-4 h-4"/>
+                                            </Button>
                                         </div>
-                                        <div className="flex items-center gap-1">
-                                            <MessageCircle className="w-4 h-4"/>
-                                            {caseItem.comments_count || 0}
-                                        </div>
-                                        <div className="flex items-center gap-1">
-                                            <Bookmark className="w-4 h-4"/>
-                                            {caseItem.favorites_count || 0}
-                                        </div>
-                                    </div>
-                                    <div className="flex gap-2">
-                                        <Button
-                                            variant="outline"
-                                            size="sm"
-                                            onClick={() => handleShowDetail(caseItem.id)}
-                                        >
-                                            查看详情
-                                        </Button>
-                                        <Button
-                                            variant="outline"
-                                            size="sm"
-                                            onClick={() => handleLike(caseItem.id)}
-                                        >
-                                            <Heart className="w-4 h-4"/>
-                                        </Button>
-                                        <Button
-                                            variant="outline"
-                                            size="sm"
-                                            onClick={() => handleFavorite(caseItem.id)}
-                                        >
-                                            <Bookmark className="w-4 h-4"/>
-                                        </Button>
                                     </div>
                                 </div>
                             </CardContent>
@@ -445,7 +430,7 @@ export default function CaseLibrary() {
             </div>
             {/* 新增：案例详情弹窗 */}
             <Dialog open={showDetailDialog} onOpenChange={setShowDetailDialog}>
-                <DialogContent className="max-w-2xl w-full bg-gradient-to-br from-blue-50 to-white border-blue-200">
+                <DialogContent className="max-w-2xl w-full bg-gradient-to-br from-blue-50 to-white border-blue-200 rounded-none">
                     <DialogHeader>
                         <DialogTitle className="text-xl font-bold text-blue-700 flex items-center gap-2">
                             <Tag className="w-5 h-5 text-blue-500"/>
@@ -475,19 +460,19 @@ export default function CaseLibrary() {
                             </div>
                             <div>
                                 <div className="font-semibold text-gray-700 mb-1">故障现象</div>
-                                <div className="bg-gray-50 rounded p-2 text-gray-800">{caseDetail.fault_phenomenon}</div>
+                                <div className="bg-gray-50 p-2 text-gray-800 rounded-none">{caseDetail.fault_phenomenon}</div>
                             </div>
                             <div>
                                 <div className="font-semibold text-gray-700 mb-1">原因分析</div>
-                                <div className="bg-gray-50 rounded p-2 text-gray-800">{caseDetail.cause_analysis}</div>
+                                <div className="bg-gray-50 p-2 text-gray-800 rounded-none">{caseDetail.cause_analysis}</div>
                             </div>
                             <div>
                                 <div className="font-semibold text-gray-700 mb-1">解决步骤</div>
-                                <div className="bg-gray-50 rounded p-2 text-gray-800 whitespace-pre-line">{caseDetail.solution_steps}</div>
+                                <div className="bg-gray-50 p-2 text-gray-800 whitespace-pre-line rounded-none">{caseDetail.solution_steps}</div>
                             </div>
                             <div>
                                 <div className="font-semibold text-gray-700 mb-1">预防措施</div>
-                                <div className="bg-gray-50 rounded p-2 text-gray-800">{caseDetail.prevention_measures}</div>
+                                <div className="bg-gray-50 p-2 text-gray-800 rounded-none">{caseDetail.prevention_measures}</div>
                             </div>
                             <div className="flex gap-6 mt-2 text-sm text-gray-500">
                                 <span className="flex items-center gap-1"><Eye className="w-4 h-4"/>{caseDetail.views_count || 0} 浏览</span>

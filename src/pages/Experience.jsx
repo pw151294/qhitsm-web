@@ -101,13 +101,13 @@ export default function Experience() {
 
     // 页面内容
     return (
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 p-4 md:p-8">
+        <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 p-4 md:p-8">
             <div className="max-w-7xl mx-auto">
+                {/* 根据tab参数动态显示页面头部文本 */}
                 <div className="mb-8">
-                    <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-2">
-                        经验分享与案例学习平台
+                    <h1 className="text-3xl md:text-4xl font-bold text-black mb-2">
+                        {tab === "forum" ? "技术论坛" : "案例库"}
                     </h1>
-                    <p className="text-gray-600 text-lg">分享经验，学习成长，共建技术社区</p>
                 </div>
 
                 {/* 不再显示Tabs，仅根据tab参数渲染内容 */}

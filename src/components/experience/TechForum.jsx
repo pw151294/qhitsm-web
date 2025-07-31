@@ -73,13 +73,9 @@ export default function TechForum({
         }
     };
 
-    const getCategoryColor = (category) => {
-        const colors = {
-            "新手问答": "bg-green-100 text-green-700 border-green-200",
-            "技术攻坚": "bg-red-100 text-red-700 border-red-200",
-            "行业动态": "bg-blue-100 text-blue-700 border-blue-200"
-        };
-        return colors[category] || "bg-gray-100 text-gray-700 border-gray-200";
+    // 帖子类型标签样式，参考案例库页面
+    const getCategoryColor = () => {
+        return "bg-blue-50 text-blue-700 border-blue-200";
     };
 
     // 新增：回复弹窗相关状态
@@ -121,133 +117,129 @@ export default function TechForum({
         }
     };
 
-    // 新增：详情弹窗相关状态
-    const [detailDialogOpen, setDetailDialogOpen] = useState(false);
+    // 帖子详情弹窗相关状态
+    const [showDetailDialog, setShowDetailDialog] = useState(false);
     const [detailLoading, setDetailLoading] = useState(false);
-    const [detailData, setDetailData] = useState(null);
+    const [postDetail, setPostDetail] = useState(null);
 
-    // 新增：查看详情处理函数
-    const handleViewDetail = async (postId) => {
-        setDetailDialogOpen(true);
+    // 查看详情处理函数
+    const handleShowDetail = async (postId) => {
+        setShowDetailDialog(true);
         setDetailLoading(true);
-        setDetailData(null);
         try {
-            const res = await fetch(`/api/forum/posts/${postId}`);
-            const json = await res.json();
-            if (json.code === 200) {
-                setDetailData(json.data);
+            const resp = await fetch(`/api/forum/posts/${postId}`);
+            const result = await resp.json();
+            if (result.code === 200 && result.data) {
+                setPostDetail(result.data);
             } else {
-                setDetailData({error: "获取详情失败"});
+                setPostDetail(null);
             }
         } catch (e) {
-            setDetailData({error: "网络错误"});
-        } finally {
-            setDetailLoading(false);
+            setPostDetail(null);
         }
+        setDetailLoading(false);
     };
 
     return (
         <div className="space-y-6">
             {/* 分类导航 */}
-            <Card className="bg-white/80 backdrop-blur-sm">
-                <CardHeader>
-                    <div className="flex justify-between items-center">
-                        <CardTitle className="text-lg">讨论分类</CardTitle>
-                        <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
-                            <DialogTrigger asChild>
-                                <Button className="bg-blue-600 hover:bg-blue-700">
-                                    <Plus className="w-4 h-4 mr-2"/>
+            <div className="flex gap-4 flex-wrap items-center">
+                {categories.map((cat) => (
+                    <Button
+                        key={cat}
+                        variant={category === cat ? "default" : "outline"}
+                        onClick={() => handleCategoryChange(cat)}
+                        className={`${category === cat ? "bg-blue-600" : ""} rounded-none`}
+                    >
+                        {cat}
+                    </Button>
+                ))}
+                <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
+                    <DialogTrigger asChild>
+                        <Button className="bg-blue-600 hover:bg-blue-700 rounded-none">
+                            <Plus className="w-4 h-4 mr-2"/>
+                            发布帖子
+                        </Button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-2xl">
+                        <DialogHeader>
+                            <DialogTitle>发布新帖子</DialogTitle>
+                        </DialogHeader>
+                        <div className="space-y-4">
+                            <div>
+                                <Label>帖子标题</Label>
+                                <Input
+                                    value={newPost.title}
+                                    onChange={(e) => setNewPost({...newPost, title: e.target.value})}
+                                    placeholder="输入帖子标题"
+                                />
+                            </div>
+                            <div>
+                                <Label>分类</Label>
+                                <Select
+                                    value={newPost.category}
+                                    onValueChange={(value) => setNewPost({...newPost, category: value})}
+                                >
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="选择分类"/>
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="新手问答">新手问答</SelectItem>
+                                        <SelectItem value="技术攻坚">技术攻坚</SelectItem>
+                                        <SelectItem value="行业动态">行业动态</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <div>
+                                <Label>悬赏积分（可选）</Label>
+                                <Input
+                                    type="number"
+                                    value={newPost.reward_points}
+                                    onChange={(e) => setNewPost({
+                                        ...newPost,
+                                        reward_points: parseInt(e.target.value) || 0
+                                    })}
+                                    placeholder="输入悬赏积分"
+                                />
+                            </div>
+                            <div>
+                                <Label>帖子内容</Label>
+                                <Textarea
+                                    value={newPost.content}
+                                    onChange={(e) => setNewPost({...newPost, content: e.target.value})}
+                                    placeholder="详细描述你的问题或想法"
+                                    rows={6}
+                                />
+                            </div>
+                            <div className="flex justify-end gap-2">
+                                <Button
+                                    variant="outline"
+                                    onClick={() => setShowCreateDialog(false)}
+                                    className="hover:text-[#478bff]"
+                                >
+                                    取消
+                                </Button>
+                                <Button
+                                    onClick={handleCreatePost}
+                                    className="bg-[#1f69ff] hover:bg-[#1f69ff]"
+                                >
                                     发布帖子
                                 </Button>
-                            </DialogTrigger>
-                            <DialogContent className="max-w-2xl">
-                                <DialogHeader>
-                                    <DialogTitle>发布新帖子</DialogTitle>
-                                </DialogHeader>
-                                <div className="space-y-4">
-                                    <div>
-                                        <Label>帖子标题</Label>
-                                        <Input
-                                            value={newPost.title}
-                                            onChange={(e) => setNewPost({...newPost, title: e.target.value})}
-                                            placeholder="输入帖子标题"
-                                        />
-                                    </div>
-                                    <div>
-                                        <Label>分类</Label>
-                                        <Select
-                                            value={newPost.category}
-                                            onValueChange={(value) => setNewPost({...newPost, category: value})}
-                                        >
-                                            <SelectTrigger>
-                                                <SelectValue placeholder="选择分类"/>
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                <SelectItem value="新手问答">新手问答</SelectItem>
-                                                <SelectItem value="技术攻坚">技术攻坚</SelectItem>
-                                                <SelectItem value="行业动态">行业动态</SelectItem>
-                                            </SelectContent>
-                                        </Select>
-                                    </div>
-                                    <div>
-                                        <Label>悬赏积分（可选）</Label>
-                                        <Input
-                                            type="number"
-                                            value={newPost.reward_points}
-                                            onChange={(e) => setNewPost({
-                                                ...newPost,
-                                                reward_points: parseInt(e.target.value) || 0
-                                            })}
-                                            placeholder="输入悬赏积分"
-                                        />
-                                    </div>
-                                    <div>
-                                        <Label>帖子内容</Label>
-                                        <Textarea
-                                            value={newPost.content}
-                                            onChange={(e) => setNewPost({...newPost, content: e.target.value})}
-                                            placeholder="详细描述你的问题或想法"
-                                            rows={6}
-                                        />
-                                    </div>
-                                    <div className="flex justify-end gap-2">
-                                        <Button variant="outline" onClick={() => setShowCreateDialog(false)}>
-                                            取消
-                                        </Button>
-                                        <Button onClick={handleCreatePost}>
-                                            发布帖子
-                                        </Button>
-                                    </div>
-                                </div>
-                            </DialogContent>
-                        </Dialog>
-                    </div>
-                </CardHeader>
-                <CardContent>
-                    <div className="flex gap-4 flex-wrap">
-                        {categories.map((cat) => (
-                            <Button
-                                key={cat}
-                                variant={category === cat ? "default" : "outline"}
-                                onClick={() => handleCategoryChange(cat)}
-                                className={category === cat ? "bg-blue-600" : ""}
-                            >
-                                {cat}
-                            </Button>
-                        ))}
-                        <Input
-                            className="ml-4 w-48"
-                            placeholder="搜索关键词"
-                            value={keyword}
-                            onChange={handleKeywordChange}
-                        />
-                    </div>
-                </CardContent>
-            </Card>
+                            </div>
+                        </div>
+                    </DialogContent>
+                </Dialog>
+                <Input
+                    className="ml-4 w-48 rounded-none"
+                    placeholder="搜索关键词"
+                    value={keyword}
+                    onChange={handleKeywordChange}
+                />
+            </div>
 
             {/* 精华轮播 */}
             {featuredPosts.length > 0 && (
-                <Card className="bg-gradient-to-r from-yellow-50 to-orange-50 border-yellow-200">
+                <Card className="bg-gradient-to-r from-yellow-50 to-orange-50 border-yellow-200 rounded-none">
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2 text-lg text-yellow-800">
                             <Star className="w-5 h-5"/>
@@ -282,7 +274,7 @@ export default function TechForum({
             )}
 
             {/* 讨论区列表 */}
-            <Card className="bg-white/80 backdrop-blur-sm">
+            <Card className="bg-white/80 backdrop-blur-sm rounded-none">
                 <CardHeader>
                     <CardTitle className="text-lg">讨论列表</CardTitle>
                 </CardHeader>
@@ -306,34 +298,17 @@ export default function TechForum({
                             posts.map((post) => (
                                 <div key={post.id}
                                      className="flex items-start space-x-4 p-4 border-b hover:bg-gray-50/50 transition-colors">
-                                    <div className="flex-shrink-0">
-                                        {post.is_pinned && (
-                                            <div
-                                                className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
-                                                <Pin className="w-6 h-6 text-red-600"/>
-                                            </div>
-                                        )}
-                                        {post.reward_points > 0 && !post.is_pinned && (
-                                            <div
-                                                className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
-                                                <Award className="w-6 h-6 text-yellow-600"/>
-                                            </div>
-                                        )}
-                                        {!post.is_pinned && post.reward_points === 0 && (
-                                            <div
-                                                className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                                                <MessageCircle className="w-6 h-6 text-blue-600"/>
-                                            </div>
-                                        )}
-                                    </div>
-
+                                    {/* 删除左侧图标 */}
+                                    {/* <div className="flex-shrink-0">
+                                        ...图标相关代码...
+                                    </div> */}
                                     <div className="flex-1 min-w-0">
                                         <div className="flex items-start justify-between">
                                             <div>
                                                 <h3 className="font-medium text-gray-900 line-clamp-1">{post.title}</h3>
                                                 <div className="flex items-center gap-2 mt-1">
                                                     <Badge variant="outline"
-                                                           className={getCategoryColor(post.category)}>
+                                                           className={getCategoryColor()}>
                                                         {post.category}
                                                     </Badge>
                                                     {post.reward_points > 0 && (
@@ -376,10 +351,9 @@ export default function TechForum({
                                                 <Button
                                                     variant="outline"
                                                     size="sm"
-                                                    onClick={() => handleViewDetail(post.id)}
-                                                    disabled={detailLoading && detailDialogOpen}
+                                                    onClick={() => handleShowDetail(post.id)}
                                                 >
-                                                    {detailLoading && detailDialogOpen ? "加载中..." : "查看详情"}
+                                                    查看详情
                                                 </Button>
                                             </div>
                                         </div>
@@ -414,114 +388,99 @@ export default function TechForum({
                     </div>
                 </DialogContent>
             </Dialog>
-
-            {/* 新增：详情弹窗 */}
-            <Dialog open={detailDialogOpen} onOpenChange={(open) => {
-                setDetailDialogOpen(open);
-                if (!open) setDetailData(null);
-            }}>
-                <DialogContent className="max-w-3xl p-0 overflow-hidden">
-                    <div className="bg-gradient-to-br from-blue-50 via-white to-gray-50 rounded-lg shadow-lg">
-                        <DialogHeader className="px-6 pt-6 pb-2">
-                            <DialogTitle className="flex items-center gap-3 text-2xl font-bold text-blue-800">
-                                {detailLoading ? (
-                                    <span className="text-base text-gray-400">加载中...</span>
-                                ) : detailData?.error ? (
-                                    <span className="text-base text-red-500">{detailData.error}</span>
-                                ) : (
-                                    <>
-                                        {detailData?.is_pinned && (
-                                            <Pin className="w-6 h-6 text-red-500"/>
-                                        )}
-                                        {detailData?.is_featured && (
-                                            <Star className="w-6 h-6 text-orange-500"/>
-                                        )}
-                                        {detailData?.title}
-                                    </>
+            {/* 新增：帖子详情弹窗 */}
+            <Dialog open={showDetailDialog} onOpenChange={setShowDetailDialog}>
+                <DialogContent className="max-w-3xl w-full bg-gradient-to-br from-blue-50 to-white border-blue-200 rounded-lg">
+                    <DialogHeader>
+                        <DialogTitle className="text-2xl font-bold text-blue-700 flex items-center gap-2">
+                            {postDetail?.is_pinned && (
+                                <Pin className="w-5 h-5 text-red-500"/>
+                            )}
+                            {postDetail?.is_featured && (
+                                <Star className="w-5 h-5 text-orange-400"/>
+                            )}
+                            {postDetail?.title || "帖子详情"}
+                        </DialogTitle>
+                    </DialogHeader>
+                    {detailLoading ? (
+                        <div className="space-y-4">
+                            <Skeleton className="h-6 w-2/3"/>
+                            <Skeleton className="h-4 w-full"/>
+                            <Skeleton className="h-4 w-5/6"/>
+                        </div>
+                    ) : postDetail ? (
+                        <div className="space-y-4">
+                            <div className="flex flex-wrap gap-2 items-center">
+                                <Badge variant="outline" className={getCategoryColor()}>
+                                    {postDetail.category}
+                                </Badge>
+                                {postDetail.reward_points > 0 && (
+                                    <Badge className="bg-yellow-100 text-yellow-800">
+                                        <Award className="w-3 h-3 mr-1"/>
+                                        {postDetail.reward_points}积分
+                                    </Badge>
                                 )}
-                            </DialogTitle>
-                        </DialogHeader>
-                        {!detailLoading && detailData && !detailData.error && (
-                            <div className="px-6 pb-6">
-                                {/* 作者与分类 */}
-                                <div className="flex items-center gap-4 mb-4">
-                                    <img
-                                        src={detailData.author_info?.avatar_url}
-                                        alt="avatar"
-                                        className="w-12 h-12 rounded-full border border-blue-200 object-cover"
-                                    />
-                                    <div>
-                                        <div className="font-semibold text-blue-900">{detailData.author_info?.full_name}</div>
-                                        <div className="text-xs text-gray-500 flex items-center gap-2">
-                                            Lv.{detailData.author_info?.level}
-                                            {detailData.author_info?.certification && (
-                                                <span className="bg-blue-100 text-blue-700 px-2 py-0.5 rounded ml-1">{detailData.author_info.certification}</span>
-                                            )}
-                                        </div>
-                                    </div>
-                                    <div className="ml-auto flex gap-2">
-                                        <Badge variant="outline" className={getCategoryColor(detailData.category)}>
-                                            {detailData.category}
-                                        </Badge>
-                                        {detailData.reward_points > 0 && (
-                                            <Badge className="bg-yellow-100 text-yellow-800">
-                                                <Award className="w-3 h-3 mr-1"/>
-                                                {detailData.reward_points}积分
-                                            </Badge>
-                                        )}
-                                        {detailData.is_featured && (
-                                            <Badge className="bg-orange-100 text-orange-800">
-                                                <Star className="w-3 h-3 mr-1"/>
-                                                精华
-                                            </Badge>
-                                        )}
-                                    </div>
-                                </div>
-                                {/* 内容 */}
-                                <div className="bg-white rounded p-4 mb-4 border border-gray-100">
-                                    <div className="text-gray-900 text-base whitespace-pre-line">{detailData.content}</div>
-                                </div>
-                                {/* 统计信息 */}
-                                <div className="flex gap-6 text-gray-500 text-sm mb-4">
-                                    <div className="flex items-center gap-1">
-                                        <Eye className="w-4 h-4"/>
-                                        {detailData.views_count} 浏览
-                                    </div>
-                                    <div className="flex items-center gap-1">
-                                        <MessageCircle className="w-4 h-4"/>
-                                        {detailData.replies_count} 回复
-                                    </div>
-                                    <div className="flex items-center gap-1">
-                                        <Star className="w-4 h-4"/>
-                                        {detailData.likes_count} 点赞
-                                    </div>
-                                    <div className="flex items-center gap-1">
+                                {postDetail.is_featured && (
+                                    <Badge className="bg-orange-100 text-orange-800">
+                                        <Star className="w-3 h-3 mr-1"/>
+                                        精华
+                                    </Badge>
+                                )}
+                                <span className="flex items-center gap-1 text-gray-500 text-xs ml-auto">
+                                    <User className="w-4 h-4"/>
+                                    {postDetail.author_info?.full_name || postDetail.created_by?.split('@')[0] || "匿名用户"}
+                                    <span className="ml-2 flex items-center gap-1">
                                         <Calendar className="w-4 h-4"/>
-                                        {format(new Date(detailData.created_date), 'yyyy-MM-dd HH:mm', {locale: zhCN})}
-                                    </div>
-                                </div>
-                                {/* 回复列表 */}
+                                        {format(new Date(postDetail.created_date), 'yyyy-MM-dd HH:mm', {locale: zhCN})}
+                                    </span>
+                                </span>
+                            </div>
+                            <div className="flex items-center gap-3 mt-2">
+                                {postDetail.author_info?.avatar_url && (
+                                    <img
+                                        src={postDetail.author_info.avatar_url}
+                                        alt="avatar"
+                                        className="w-10 h-10 rounded-full border"
+                                    />
+                                )}
                                 <div>
-                                    <div className="font-semibold text-gray-700 mb-2">回复</div>
-                                    {detailData.replies && detailData.replies.length > 0 ? (
-                                        <div className="space-y-3 max-h-48 overflow-y-auto pr-2">
-                                            {detailData.replies.map(reply => (
-                                                <div key={reply.id} className="bg-gray-50 rounded p-3 border border-gray-100">
-                                                    <div className="text-gray-800 text-sm">{reply.content}</div>
-                                                    <div className="text-xs text-gray-400 mt-1 flex items-center gap-2">
-                                                        <MessageCircle className="w-3 h-3"/>
-                                                        {reply.likes_count} 赞
-                                                    </div>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    ) : (
-                                        <div className="text-gray-400 text-sm">暂无回复</div>
-                                    )}
+                                    <div className="font-semibold text-gray-800">{postDetail.author_info?.full_name}</div>
+                                    <div className="text-xs text-blue-600">{postDetail.author_info?.certification}</div>
+                                    <div className="text-xs text-gray-400">Lv.{postDetail.author_info?.level}</div>
                                 </div>
                             </div>
-                        )}
-                    </div>
+                            <div>
+                                <div className="font-semibold text-gray-700 mb-1">内容</div>
+                                <div className="bg-gray-50 p-3 text-gray-800 rounded whitespace-pre-line">{postDetail.content}</div>
+                            </div>
+                            <div className="flex gap-6 mt-2 text-sm text-gray-500">
+                                <span className="flex items-center gap-1"><Eye className="w-4 h-4"/>{postDetail.views_count || 0} 浏览</span>
+                                <span className="flex items-center gap-1"><Star className="w-4 h-4"/>{postDetail.likes_count || 0} 点赞</span>
+                                <span className="flex items-center gap-1"><MessageCircle className="w-4 h-4"/>{postDetail.replies_count || 0} 回复</span>
+                            </div>
+                            <div>
+                                <div className="font-semibold text-gray-700 mb-1 mt-4">回复</div>
+                                {postDetail.replies && postDetail.replies.length > 0 ? (
+                                    <div className="space-y-2 max-h-48 overflow-y-auto">
+                                        {postDetail.replies.map(reply => (
+                                            <div key={reply.id} className="bg-blue-50 rounded p-2 text-gray-700 flex items-start gap-2">
+                                                <User className="w-4 h-4 text-blue-400 mt-1"/>
+                                                <div>
+                                                    <div className="text-xs text-gray-500 mb-1">回复ID: {reply.id}</div>
+                                                    <div className="text-sm">{reply.content}</div>
+                                                    <div className="text-xs text-gray-400 mt-1">点赞数：{reply.likes_count}</div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <div className="text-gray-400 text-sm">暂无回复</div>
+                                )}
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="text-gray-400">未能加载帖子详情</div>
+                    )}
                 </DialogContent>
             </Dialog>
         </div>

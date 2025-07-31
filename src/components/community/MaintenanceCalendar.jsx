@@ -212,7 +212,10 @@ export default function MaintenanceCalendar({events, isLoading, onRefresh, onLoa
 
                         <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
                             <DialogTrigger asChild>
-                                <Button className="bg-purple-600 hover:bg-purple-700">
+                                {/* 创建活动按钮 */}
+                                <Button
+                                    className="bg-blue-600 hover:bg-blue-700 text-white"
+                                >
                                     <Plus className="w-4 h-4 mr-2"/>
                                     创建活动
                                 </Button>
