@@ -166,7 +166,7 @@ export default function Layout({ children }) {
           className={`flex items-center w-full px-4 py-3 rounded-lg transition-all duration-200
             ${
               (isExperienceActive && currentTab) // 有子菜单被选中
-                ? 'bg-white text-blue-700'
+                ? 'bg-white text-gray-900'
                 : isExperienceActive
                   ? 'bg-blue-100 text-blue-700'
                   : 'text-gray-700 hover:text-blue-700 hover:bg-blue-50'
@@ -215,7 +215,7 @@ export default function Layout({ children }) {
           className={`flex items-center w-full px-4 py-3 rounded-lg transition-all duration-200
             ${
               (isFeedbackActive && currentFeedbackTab)
-                ? 'bg-white text-blue-700'
+                ? 'bg-white text-gray-900'
                 : isFeedbackActive
                   ? 'bg-blue-100 text-blue-700'
                   : 'text-gray-700 hover:text-blue-700 hover:bg-blue-50'
@@ -264,13 +264,13 @@ export default function Layout({ children }) {
           className={`flex items-center w-full px-4 py-3 rounded-lg transition-all duration-200
             ${
               (isCommunityActive && currentCommunityTab)
-                ? 'bg-white text-blue-700'
+                ? 'bg-white text-gray-900'
                 : isCommunityActive
                   ? 'bg-blue-100 text-blue-700'
                   : 'text-gray-700 hover:text-blue-700 hover:bg-blue-50'
             }`}
           style={{ fontWeight: 400, fontSize: "1rem" }}
-          onClick={() => isMobile ? setFbOpenMobile(v => !v) : setFbOpen(v => !v)} // 复用fbOpen变量即可
+          onClick={() => isMobile ? setFbOpenMobile(v => !v) : setFbOpen(v => !v)}
         >
           <span className="truncate">社区化运营支撑</span>
           {(isMobile ? fbOpenMobile : fbOpen)
