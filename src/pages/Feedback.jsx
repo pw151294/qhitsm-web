@@ -1,13 +1,18 @@
 import {useState, useEffect} from "react";
-import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
-import {MessageSquare, BarChart3, List} from "lucide-react";
-
 import QuickFeedback from "../components/feedback/QuickFeedback";
 import FeedbackStats from "../components/feedback/FeedbackStats";
 import FeedbackManagement from "../components/feedback/FeedbackManagement";
+import { useLocation, useNavigate } from "react-router-dom";
 
 export default function Feedback() {
-    const [activeTab, setActiveTab] = useState("quick");
+    const location = useLocation();
+    useNavigate();
+// 解析tab参数
+    const tab = (() => {
+        const m = location.search.match(/tab=(\w+)/);
+        return m ? m[1] : "quick";
+    })();
+
     const [feedbacks, setFeedbacks] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [feedbackList, setFeedbackList] = useState([]);
@@ -26,11 +31,11 @@ export default function Feedback() {
 
     // 只要filters变化且在管理tab下就刷新
     useEffect(() => {
-        if (activeTab === "management") {
+        if (tab === "management") {
             loadFeedbacks();
         }
         // eslint-disable-next-line
-    }, [filters, activeTab]);
+    }, [filters, tab]);
 
     // 页面首次加载
     useEffect(() => {
@@ -57,11 +62,11 @@ export default function Feedback() {
 
     // 切换到统计Tab或刷新时加载
     useEffect(() => {
-        if (activeTab === "stats") {
+        if (tab === "stats") {
             loadFeedbackList();
         }
         // eslint-disable-next-line
-    }, [activeTab]);
+    }, [tab]);
 
     // 统计Tab下的刷新
     const handleStatsRefresh = () => {
@@ -107,59 +112,37 @@ export default function Feedback() {
         setIsLoading(false);
     };
 
+    // 页面内容
     return (
-        <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 p-4 md:p-8">
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 p-4 md:p-8">
             <div className="max-w-7xl mx-auto">
                 <div className="mb-8">
-                    <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent mb-2">
+                    <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-2">
                         反馈与建议收集系统
                     </h1>
                     <p className="text-gray-600 text-lg">倾听用户声音，持续改进产品</p>
                 </div>
-
-                <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-                    <TabsList className="grid w-full grid-cols-3 bg-white/80 backdrop-blur-sm">
-                        <TabsTrigger value="quick"
-                                     className="flex items-center gap-2 data-[state=active]:bg-green-500 data-[state=active]:text-white">
-                            <MessageSquare className="w-4 h-4"/>
-                            快速反馈
-                        </TabsTrigger>
-                        <TabsTrigger value="stats"
-                                     className="flex items-center gap-2 data-[state=active]:bg-green-500 data-[state=active]:text-white">
-                            <BarChart3 className="w-4 h-4"/>
-                            反馈统计
-                        </TabsTrigger>
-                        <TabsTrigger value="management"
-                                     className="flex items-center gap-2 data-[state=active]:bg-green-500 data-[state=active]:text-white">
-                            <List className="w-4 h-4"/>
-                            反馈管理
-                        </TabsTrigger>
-                    </TabsList>
-
-                    <div className="mt-6">
-                        <TabsContent value="quick" className="mt-0">
-                            <QuickFeedback onSubmit={() => loadFeedbacks()}/>
-                        </TabsContent>
-
-                        <TabsContent value="stats" className="mt-0">
-                            <FeedbackStats
-                                feedbacks={feedbackList}
-                                isLoading={isStatsLoading}
-                                onRefresh={handleStatsRefresh}
-                            />
-                        </TabsContent>
-
-                        <TabsContent value="management" className="mt-0">
-                            <FeedbackManagement
-                                feedbacks={feedbacks}
-                                isLoading={isLoading}
-                                onRefresh={() => loadFeedbacks()}
-                                filters={filters}
-                                setFilters={setFilters}
-                            />
-                        </TabsContent>
-                    </div>
-                </Tabs>
+                <div className="mt-6">
+                    {tab === "quick" && (
+                        <QuickFeedback onSubmit={() => loadFeedbacks()}/>
+                    )}
+                    {tab === "stats" && (
+                        <FeedbackStats
+                            feedbacks={feedbackList}
+                            isLoading={isStatsLoading}
+                            onRefresh={handleStatsRefresh}
+                        />
+                    )}
+                    {tab === "management" && (
+                        <FeedbackManagement
+                            feedbacks={feedbacks}
+                            isLoading={isLoading}
+                            onRefresh={() => loadFeedbacks()}
+                            filters={filters}
+                            setFilters={setFilters}
+                        />
+                    )}
+                </div>
             </div>
         </div>
     );

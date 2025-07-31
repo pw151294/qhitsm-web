@@ -1,11 +1,18 @@
 import {useEffect, useState} from "react";
-import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
-import {Database, MessageCircle} from "lucide-react";
+import {useLocation, useNavigate} from "react-router-dom";
 import CaseLibrary from "../components/experience/CaseLibrary";
 import TechForum from "../components/experience/TechForum";
 
 export default function Experience() {
-    const [activeTab, setActiveTab] = useState("cases");
+    const location = useLocation();
+    useNavigate();
+// 解析tab参数
+    const tab = (() => {
+        const m = location.search.match(/tab=(\w+)/);
+        return m ? m[1] : "cases";
+    })();
+
+    // 案例库和论坛帖子状态
     const [cases, setCases] = useState([]);
     const [forumPosts, setForumPosts] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -16,11 +23,12 @@ export default function Experience() {
     const [forumCategory, setForumCategory] = useState("全部");
     const [forumKeyword, setForumKeyword] = useState("");
 
-    // 只要筛选条件变化就刷新论坛帖子列表
     useEffect(() => {
-        loadForumPosts();
+        if (tab === "forum") {
+            loadForumPosts();
+        }
         // eslint-disable-next-line
-    }, [forumPage, forumSize, forumCategory, forumKeyword]);
+    }, [tab, forumPage, forumSize, forumCategory, forumKeyword]);
 
     const loadForumPosts = async () => {
         setIsLoading(true);
@@ -59,9 +67,11 @@ export default function Experience() {
     const [keyword] = useState("");
 
     useEffect(() => {
-        loadCases();
+        if (tab === "cases") {
+            loadCases();
+        }
         // eslint-disable-next-line
-    }, [casePage, caseSize, caseSort, faultType, timeRange, likesMin, keyword]);
+    }, [tab, casePage, caseSize, caseSort, faultType, timeRange, likesMin, keyword]);
 
     const loadCases = async () => {
         setIsLoading(true);
@@ -89,15 +99,7 @@ export default function Experience() {
         setIsLoading(false);
     };
 
-    // 页面切换到技术论坛时立即加载讨论列表
-    useEffect(() => {
-        if (activeTab === "forum") {
-            loadForumPosts();
-        }
-        // eslint-disable-next-line
-    }, [activeTab]);
-
-    // 筛选条件输入控件
+    // 页面内容
     return (
         <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 p-4 md:p-8">
             <div className="max-w-7xl mx-auto">
@@ -108,41 +110,26 @@ export default function Experience() {
                     <p className="text-gray-600 text-lg">分享经验，学习成长，共建技术社区</p>
                 </div>
 
-                <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-                    <TabsList className="grid w-full grid-cols-2 bg-white/80 backdrop-blur-sm">
-                        <TabsTrigger value="cases"
-                                     className="flex items-center gap-2 data-[state=active]:bg-blue-500 data-[state=active]:text-white">
-                            <Database className="w-4 h-4"/>
-                            案例库
-                        </TabsTrigger>
-                        <TabsTrigger value="forum"
-                                     className="flex items-center gap-2 data-[state=active]:bg-blue-500 data-[state=active]:text-white">
-                            <MessageCircle className="w-4 h-4"/>
-                            技术论坛
-                        </TabsTrigger>
-                    </TabsList>
-
-                    <div className="mt-6">
-                        <TabsContent value="cases" className="mt-0">
-                            <CaseLibrary
-                                cases={cases}
-                                isLoading={isLoading}
-                            />
-                        </TabsContent>
-
-                        <TabsContent value="forum" className="mt-0">
-                            <TechForum
-                                posts={forumPosts}
-                                isLoading={isLoading}
-                                onCategoryChange={setForumCategory}
-                                category={forumCategory}
-                                onKeywordChange={setForumKeyword}
-                                keyword={forumKeyword}
-                                onRefresh={loadForumPosts}
-                            />
-                        </TabsContent>
-                    </div>
-                </Tabs>
+                {/* 不再显示Tabs，仅根据tab参数渲染内容 */}
+                <div className="mt-6">
+                    {tab === "cases" && (
+                        <CaseLibrary
+                            cases={cases}
+                            isLoading={isLoading}
+                        />
+                    )}
+                    {tab === "forum" && (
+                        <TechForum
+                            posts={forumPosts}
+                            isLoading={isLoading}
+                            onCategoryChange={setForumCategory}
+                            category={forumCategory}
+                            onKeywordChange={setForumKeyword}
+                            keyword={forumKeyword}
+                            onRefresh={loadForumPosts}
+                        />
+                    )}
+                </div>
             </div>
         </div>
     );

@@ -91,29 +91,6 @@ export default function FeedbackManagement({ feedbacks, isLoading, onRefresh, fi
     }
   };
 
-  const handleExportReport = () => {
-    const csvContent = [
-      ["ID", "类型", "内容摘要", "提交人", "状态", "创建时间"],
-      ...filteredFeedbacks.map(f => [
-        f.id,
-        f.type,
-        f.content.substring(0, 50) + "...",
-        f.created_by?.split('@')[0] || '匿名',
-        f.status,
-        format(new Date(f.created_date), 'yyyy-MM-dd HH:mm')
-      ])
-    ].map(row => row.join(','))
-     .join('\n');
-
-    const blob = new Blob([csvContent], { type: 'text/csv' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = '反馈报告.csv';
-    a.click();
-    URL.revokeObjectURL(url);
-  };
-
   return (
     <div className="space-y-6">
       {/* 筛选和操作栏 */}
@@ -124,10 +101,6 @@ export default function FeedbackManagement({ feedbacks, isLoading, onRefresh, fi
               <Filter className="w-5 h-5 text-blue-600" />
               反馈管理
             </CardTitle>
-            <Button onClick={handleExportReport} variant="outline">
-              <Download className="w-4 h-4 mr-2" />
-              导出报告
-            </Button>
           </div>
         </CardHeader>
         <CardContent>
