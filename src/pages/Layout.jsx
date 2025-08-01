@@ -61,16 +61,6 @@ const navigationItems = [
         url: "/Community?tab=growth",
         tab: "growth",
       },
-      {
-        title: "贡献排行榜",
-        url: "/Community?tab=leaderboard",
-        tab: "leaderboard",
-      },
-      {
-        title: "运维日历",
-        url: "/Community?tab=calendar",
-        tab: "calendar",
-      },
     ],
   },
 ];

@@ -1,20 +1,10 @@
 import React, { useEffect, useRef } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
 import UserGrowth from "../components/community/UserGrowth";
-import Leaderboard from "../components/community/Leaderboard";
 // import InstantMessaging from "../components/community/InstantMessaging";
 import MaintenanceCalendar from "../components/community/MaintenanceCalendar";
 import { Event, User } from "@/api/entities";
 
 export default function Community() {
-    const location = useLocation();
-    useNavigate();
-// 解析tab参数
-    const tab = (() => {
-        const m = location.search.match(/tab=(\w+)/);
-        return m ? m[1] : "growth";
-    })();
-
     const [users, setUsers] = React.useState([]);
     const [events, setEvents] = React.useState([]);
     const [isLoading, setIsLoading] = React.useState(true);
@@ -39,14 +29,7 @@ export default function Community() {
         // eslint-disable-next-line
     }, []);
 
-    // 切换到运维日历Tab时加载活动信息
-    useEffect(() => {
-        if (tab === "calendar") {
-            loadEvents();
-        }
-        // eslint-disable-next-line
-    }, [tab]);
-
+    // 只保留成长中心内容，无tab切换
     const loadData = async () => {
         setIsLoading(true);
         try {
@@ -66,30 +49,23 @@ export default function Community() {
     return (
         <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 p-4 md:p-8">
             <div className="max-w-7xl mx-auto">
+                {/* 只显示成长中心页头 */}
                 <div className="mb-8">
-                    <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent mb-2">
-                        社区化运营支撑功能
+                    <h1 className="text-3xl md:text-4xl font-bold text-black mb-2">
+                        用户成长中心
                     </h1>
-                    <p className="text-gray-600 text-lg">构建活跃社区，促进用户交流与成长</p>
                 </div>
                 <div className="mt-6">
-                    {tab === "growth" && (
-                        <UserGrowth users={users} isLoading={isLoading} />
-                    )}
-                    {tab === "leaderboard" && (
-                        <Leaderboard users={users} isLoading={isLoading} />
-                    )}
-                    {/* {tab === "messaging" && (
-                        <InstantMessaging />
-                    )} */}
-                    {tab === "calendar" && (
-                        <MaintenanceCalendar
-                            events={events}
-                            isLoading={isLoading}
-                            onRefresh={loadEvents}
-                            onLoadEvents={fn => (loadEventsRef.current = fn)}
-                        />
-                    )}
+                    <UserGrowth users={users} isLoading={isLoading} />
+                </div>
+                {/* 运维日历始终在成长中心内容下方展示 */}
+                <div className="mt-10">
+                    <MaintenanceCalendar
+                        events={events}
+                        isLoading={isLoading}
+                        onRefresh={loadEvents}
+                        onLoadEvents={fn => (loadEventsRef.current = fn)}
+                    />
                 </div>
             </div>
         </div>

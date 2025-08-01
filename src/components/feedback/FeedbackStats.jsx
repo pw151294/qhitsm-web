@@ -274,7 +274,8 @@ export default function FeedbackStats({ feedbacks, isLoading, onRefresh }) {
                   </Badge>
                   <span className="text-sm font-medium">{item.issue}</span>
                 </div>
-                <Badge className="bg-red-100 text-red-700 rounded-none">
+                {/* 修复“1次”Badge悬浮变黑问题 */}
+                <Badge className="bg-red-100 text-red-700 rounded-none hover:bg-red-100 hover:text-red-700">
                   {item.count} 次
                 </Badge>
               </div>
@@ -331,8 +332,7 @@ export default function FeedbackStats({ feedbacks, isLoading, onRefresh }) {
                   )}
                 </div>
                 {/* 内容展示区域增加最大高度和滚动 */}
-                <div className="bg-white border border-blue-100 p-4 text-gray-800 text-base leading-relaxed max-h-56 overflow-auto rounded-none">
-                  <span className="font-semibold text-gray-700">内容：</span>
+                <div className="bg-white border border-blue-100 p-4 text-gray-800 text-sm leading-relaxed max-h-56 overflow-auto rounded-none">
                   {detailData.content}
                 </div>
                 <div className="grid grid-cols-2 gap-4 text-sm">
@@ -357,7 +357,7 @@ export default function FeedbackStats({ feedbacks, isLoading, onRefresh }) {
                     <span>{detailData.responsible_team || "未指定"}</span>
                   </div>
                 </div>
-                <div>
+                <div className="text-sm">
                   <span className="text-gray-500">处理结果：</span>
                   <span className="ml-2">{detailData.resolution || <span className="text-gray-400">暂无</span>}</span>
                 </div>

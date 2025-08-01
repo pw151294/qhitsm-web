@@ -188,39 +188,35 @@ export default function MaintenanceCalendar({events, isLoading, onRefresh, onLoa
 
     return (
         <div className="space-y-6">
-            {/* 日历头部 */}
-            <Card className="bg-white/80 backdrop-blur-sm">
-                <CardHeader>
-                    <div className="flex justify-between items-center">
+            {/* 合并三卡片为一张大卡片 */}
+            <Card className="bg-white/90 backdrop-blur-sm shadow-md rounded-none p-0">
+                <CardHeader className="pb-0 rounded-none">
+                    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                         <div className="flex items-center gap-4">
-                            <CardTitle className="flex items-center gap-2 text-xl">
+                            <CardTitle className="flex items-center gap-2 text-xl rounded-none">
                                 <CalendarIcon className="w-6 h-6 text-purple-600"/>
                                 运维日历
                             </CardTitle>
                             <div className="flex items-center gap-2">
-                                <Button variant="outline" size="icon" onClick={() => navigateMonth('prev')}>
+                                <Button variant="outline" size="icon" onClick={() => navigateMonth('prev')} className="rounded-none">
                                     <ChevronLeft className="w-4 h-4"/>
                                 </Button>
-                                <h3 className="text-lg font-semibold min-w-32 text-center">
+                                <h3 className="text-lg font-semibold min-w-32 text-center rounded-none">
                                     {format(currentDate, 'yyyy年 MM月', {locale: zhCN})}
                                 </h3>
-                                <Button variant="outline" size="icon" onClick={() => navigateMonth('next')}>
+                                <Button variant="outline" size="icon" onClick={() => navigateMonth('next')} className="rounded-none">
                                     <ChevronRight className="w-4 h-4"/>
                                 </Button>
                             </div>
                         </div>
-
                         <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
                             <DialogTrigger asChild>
-                                {/* 创建活动按钮 */}
-                                <Button
-                                    className="bg-blue-600 hover:bg-blue-700 text-white"
-                                >
+                                <Button className="bg-blue-600 hover:bg-blue-700 text-white rounded-none">
                                     <Plus className="w-4 h-4 mr-2"/>
                                     创建活动
                                 </Button>
                             </DialogTrigger>
-                            <DialogContent className="max-w-2xl">
+                            <DialogContent className="max-w-2xl rounded-none">
                                 <DialogHeader>
                                     <DialogTitle>创建新活动</DialogTitle>
                                 </DialogHeader>
@@ -302,26 +298,22 @@ export default function MaintenanceCalendar({events, isLoading, onRefresh, onLoa
                         </Dialog>
                     </div>
                 </CardHeader>
-            </Card>
-
-            {/* 主体两列布局：左侧日历，右侧近期活动 */}
-            <div className="flex flex-col lg:flex-row gap-6">
-                {/* 左侧：日历网格 */}
-                <div className="flex-1 min-w-0">
-                    <Card className="bg-white/80 backdrop-blur-sm">
-                        <CardContent className="p-6">
+                <CardContent className="pt-6 rounded-none">
+                    {/* 使左右两栏头部和底部对齐 */}
+                    <div className="flex flex-col lg:flex-row gap-8 h-full">
+                        {/* 左侧：日历网格 */}
+                        <div className="flex-1 min-w-0 flex flex-col">
                             {/* 星期头部 */}
                             <div className="grid grid-cols-7 gap-2 mb-4">
                                 {['周日', '周一', '周二', '周三', '周四', '周五', '周六'].map((day) => (
                                     <div key={day}
-                                         className="p-2 text-center font-medium text-gray-600 bg-gray-50 rounded">
+                                         className="p-2 text-center font-medium text-gray-600 bg-gray-50 rounded-none">
                                         {day}
                                     </div>
                                 ))}
                             </div>
-
                             {/* 日期网格 */}
-                            <div className="grid grid-cols-7 gap-2">
+                            <div className="grid grid-cols-7 gap-2 flex-1">
                                 {monthDays.map((day) => {
                                     const dayEvents = getEventsForDate(day);
                                     const isCurrentMonth = isSameMonth(day, currentDate);
@@ -330,7 +322,7 @@ export default function MaintenanceCalendar({events, isLoading, onRefresh, onLoa
                                     return (
                                         <div
                                             key={day.toISOString()}
-                                            className={`min-h-24 p-2 border rounded-lg transition-colors ${
+                                            className={`min-h-24 p-2 border transition-colors rounded-none ${
                                                 isCurrentMonth
                                                     ? isTodayDate
                                                         ? 'bg-purple-50 border-purple-300'
@@ -354,7 +346,7 @@ export default function MaintenanceCalendar({events, isLoading, onRefresh, onLoa
                                                                 setSelectedEvent(event);
                                                                 setShowEventDialog(true);
                                                             }}
-                                                            className={`text-xs p-1 rounded cursor-pointer hover:opacity-80 ${getEventColor(event.type)}`}
+                                                            className={`text-xs p-1 cursor-pointer hover:opacity-80 rounded-none ${getEventColor(event.type).replace(/rounded(-\w+)?/g, "rounded-none")}`}
                                                         >
                                                             <div className="flex items-center gap-1">
                                                                 <IconComponent className="w-3 h-3 flex-shrink-0"/>
@@ -373,68 +365,68 @@ export default function MaintenanceCalendar({events, isLoading, onRefresh, onLoa
                                     );
                                 })}
                             </div>
-                        </CardContent>
-                    </Card>
-                </div>
+                        </div>
+                        {/* 右侧：近期活动栏 */}
+                        <div className="w-full lg:w-80 flex-shrink-0 flex flex-col">
+                            <div className="bg-white/0 shadow-none p-0 flex flex-col h-full rounded-none">
+                                {/* 让"近期活动"与左侧星期头部对齐 */}
+                                <div className="flex flex-col h-full">
+                                    <div className="mb-4" style={{ minHeight: "40px" }}>
+                                        <h4 className="font-medium text-gray-800 text-base leading-10 rounded-none">近期活动</h4>
+                                    </div>
+                                    {/* 让活动列表撑满右侧高度，与左侧对齐 */}
+                                    <div className="flex-1 flex flex-col justify-between">
+                                        <div className="flex-1 flex flex-col space-y-4">
+                                            {events.slice(0, 3).map(event => {
+                                                const status = getEventStatus(event);
+                                                const start = event.start_date ? new Date(event.start_date) : null;
+                                                const end = event.end_date ? new Date(event.end_date) : null;
+                                                let dateStr = "";
+                                                if (start && end && event.end_date !== event.start_date) {
+                                                    dateStr = `${start.getMonth() + 1}.${start.getDate()}-${end.getMonth() + 1}.${end.getDate()}`;
+                                                } else if (start) {
+                                                    dateStr = `${start.getMonth() + 1}.${start.getDate()}`;
+                                                }
+                                                const typeColor = getEventColor(event.type);
 
-                {/* 右侧：近期活动栏 */}
-                <div className="w-full lg:w-80 flex-shrink-0">
-                    <div className="mb-6">
-                        {/* 创建活动按钮已在头部，无需重复 */}
-                    </div>
-                    <div className="bg-white/80 backdrop-blur-sm rounded-lg shadow p-0">
-                        <div className="p-6">
-                            <h4 className="font-medium text-gray-800 mb-4">近期活动</h4>
-                            <div className="space-y-4">
-                                {events.slice(0, 3).map(event => {
-                                    const status = getEventStatus(event);
-                                    // 日期范围展示
-                                    const start = event.start_date ? new Date(event.start_date) : null;
-                                    const end = event.end_date ? new Date(event.end_date) : null;
-                                    let dateStr = "";
-                                    if (start && end && event.end_date !== event.start_date) {
-                                        dateStr = `${start.getMonth() + 1}.${start.getDate()}-${end.getMonth() + 1}.${end.getDate()}`;
-                                    } else if (start) {
-                                        dateStr = `${start.getMonth() + 1}.${start.getDate()}`;
-                                    }
-                                    // 类型颜色
-                                    const typeColor = getEventColor(event.type);
-
-                                    return (
-                                        <div
-                                            key={event.id}
-                                            className={`p-4 rounded cursor-pointer border-l-4 hover:opacity-90 ${typeColor.replace("bg-", "bg-opacity-40 bg-").replace("text-", "")}`}
-                                            onClick={() => {
-                                                setSelectedEvent(event);
-                                                setShowEventDialog(true);
-                                            }}
-                                        >
-                                            {/* 活动类型：加粗大字号 */}
-                                            <div className="flex items-center mb-2">
-                                                <span className="font-bold text-lg mr-2">{event.type}</span>
-                                                <span
-                                                    className={`px-2 py-1 rounded-full text-xs ${status.className}`}>{status.label}</span>
-                                            </div>
-                                            {/* 新增：活动日期 */}
-                                            <div className="text-xs text-gray-700 mb-1">{dateStr}</div>
-                                            <p className="text-xs text-gray-500 truncate">{event.description}</p>
+                                                return (
+                                                    <div
+                                                        key={event.id}
+                                                        className={`p-4 cursor-pointer border-l-4 hover:opacity-90 flex flex-col justify-between min-h-[128px] rounded-none ${typeColor.replace(/rounded(-\w+)?/g, "rounded-none")}`}
+                                                        style={{ minHeight: "128px" }}
+                                                        onClick={() => {
+                                                            setSelectedEvent(event);
+                                                            setShowEventDialog(true);
+                                                        }}
+                                                    >
+                                                        <div>
+                                                            <div className="flex items-center mb-2">
+                                                                <span className="font-bold text-lg mr-2">{event.type}</span>
+                                                                <span
+                                                                    className={`px-2 py-1 text-xs rounded-none ${status.className}`}>{status.label}</span>
+                                                            </div>
+                                                            <div className="text-xs text-gray-700 mb-1">{dateStr}</div>
+                                                            <p className="text-xs text-gray-500 truncate">{event.description}</p>
+                                                        </div>
+                                                    </div>
+                                                );
+                                            })}
+                                            {events.length === 0 && (
+                                                <div className="text-gray-400 text-sm text-center py-8 flex-1 rounded-none">暂无活动</div>
+                                            )}
                                         </div>
-                                    );
-                                })}
-                                {events.length === 0 && (
-                                    <div className="text-gray-400 text-sm text-center py-8">暂无活动</div>
-                                )}
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
-
+                </CardContent>
+            </Card>
             {/* 活动详情对话框 */}
             <Dialog open={showEventDialog} onOpenChange={setShowEventDialog}>
-                <DialogContent className="max-w-2xl">
+                <DialogContent className="max-w-2xl rounded-none">
                     <DialogHeader>
-                        <DialogTitle className="flex items-center gap-2">
+                        <DialogTitle className="flex items-center gap-2 rounded-none">
                             {selectedEvent && React.createElement(getEventIcon(selectedEvent.type), {
                                 className: "w-5 h-5 text-purple-600"
                             })}
@@ -446,7 +438,7 @@ export default function MaintenanceCalendar({events, isLoading, onRefresh, onLoa
                         <div className="space-y-4">
                             <div>
                                 <h3 className="text-xl font-bold mb-2">{selectedEvent.title}</h3>
-                                <Badge className={getEventColor(selectedEvent.type)}>
+                                <Badge className={getEventColor(selectedEvent.type).replace(/rounded(-\w+)?/g, "rounded-none")}>
                                     {selectedEvent.type}
                                 </Badge>
                             </div>
@@ -480,10 +472,10 @@ export default function MaintenanceCalendar({events, isLoading, onRefresh, onLoa
                             )}
 
                             <div className="flex justify-end gap-2">
-                                <Button variant="outline" onClick={() => setShowEventDialog(false)}>
+                                <Button variant="outline" onClick={() => setShowEventDialog(false)} className="rounded-none">
                                     关闭
                                 </Button>
-                                <Button className="bg-purple-600 hover:bg-purple-700">
+                                <Button className="bg-purple-600 hover:bg-purple-700 rounded-none">
                                     报名参加
                                 </Button>
                             </div>

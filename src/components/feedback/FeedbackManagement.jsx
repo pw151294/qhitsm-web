@@ -33,8 +33,8 @@ export default function FeedbackManagement({
 }) {
   const [selectedFeedback, setSelectedFeedback] = useState(null);
   const [showDetailsDialog, setShowDetailsDialog] = useState(false);
+  const [showActionDialog, setShowActionDialog] = useState(false); // 新增：操作弹窗
   const [resolution, setResolution] = useState("");
-  // 新增：负责团队输入
   const [responsibleTeam, setResponsibleTeam] = useState("");
 
   const filteredFeedbacks = feedbacks.filter(feedback => {
@@ -123,6 +123,20 @@ export default function FeedbackManagement({
   // 计算分页
   const totalPages = Math.ceil(total / size);
 
+  // 打开详情弹窗
+  const openDetailsDialog = (feedback) => {
+    setSelectedFeedback(feedback);
+    setShowDetailsDialog(true);
+  };
+
+  // 打开操作弹窗
+  const openActionDialog = (feedback) => {
+    setSelectedFeedback(feedback);
+    setResolution(feedback.resolution || "");
+    setResponsibleTeam(feedback.responsible_team || "");
+    setShowActionDialog(true);
+  };
+
   return (
     <div className="space-y-6">
       {/* 筛选和操作栏，移除外层Card */}
@@ -132,7 +146,7 @@ export default function FeedbackManagement({
             value={filters.status}
             onValueChange={(value) => setFilters(prev => ({ ...prev, status: value }))}
           >
-            <SelectTrigger className="h-10 text-sm">
+            <SelectTrigger className="h-10 text-sm bg-white rounded-none">
               <SelectValue placeholder="选择状态" />
             </SelectTrigger>
             <SelectContent>
@@ -148,7 +162,7 @@ export default function FeedbackManagement({
             value={filters.type}
             onValueChange={(value) => setFilters(prev => ({ ...prev, type: value }))}
           >
-            <SelectTrigger className="h-10 text-sm">
+            <SelectTrigger className="h-10 text-sm bg-white rounded-none">
               <SelectValue placeholder="选择类型" />
             </SelectTrigger>
             <SelectContent>
@@ -166,7 +180,7 @@ export default function FeedbackManagement({
               value={filters.keyword}
               onChange={(e) => setFilters(prev => ({ ...prev, keyword: e.target.value }))}
               placeholder="搜索反馈内容..."
-              className="pl-10 h-10 text-sm"
+              className="pl-10 h-10 text-sm bg-white rounded-none"
             />
           </div>
         </div>
@@ -177,12 +191,12 @@ export default function FeedbackManagement({
         <table className="min-w-full text-sm border border-gray-200 bg-white/80 rounded-none shadow-sm">
           <thead>
             <tr className="bg-gray-50">
-              <th className="px-4 py-2 font-semibold text-gray-700 border-b text-left w-32">反馈编号</th>
               <th className="px-4 py-2 font-semibold text-gray-700 border-b text-left w-28">反馈类别</th>
               <th className="px-4 py-2 font-semibold text-gray-700 border-b text-left w-[340px]">反馈标题</th>
               <th className="px-4 py-2 font-semibold text-gray-700 border-b text-left w-28">反馈人</th>
               <th className="px-4 py-2 font-semibold text-gray-700 border-b text-left w-32">反馈日期</th>
               <th className="px-4 py-2 font-semibold text-gray-700 border-b text-left w-28">反馈状态</th>
+              <th className="px-4 py-2 font-semibold text-gray-700 border-b text-left w-28">查看详情</th>
               <th className="px-4 py-2 font-semibold text-gray-700 border-b text-left w-24">操作</th>
             </tr>
           </thead>
@@ -190,13 +204,13 @@ export default function FeedbackManagement({
             {isLoading ? (
               Array(5).fill(0).map((_, i) => (
                 <tr key={i} className="border-b">
-                  <td className="px-4 py-3"><Skeleton className="h-4 w-16" /></td>
                   <td className="px-4 py-3"><Skeleton className="h-4 w-20" /></td>
-                  <td className="px-4 py-3"><Skeleton className="h-4 w-32" /></td>
+                  <td className="px-4 py-3"><Skeleton className="h-4 w-36" /></td>
                   <td className="px-4 py-3"><Skeleton className="h-4 w-16" /></td>
                   <td className="px-4 py-3"><Skeleton className="h-4 w-20" /></td>
                   <td className="px-4 py-3"><Skeleton className="h-4 w-16" /></td>
                   <td className="px-4 py-3"><Skeleton className="h-8 w-16" /></td>
+                  <td className="px-4 py-3"><Skeleton className="h-8 w-12" /></td>
                 </tr>
               ))
             ) : (
@@ -204,7 +218,6 @@ export default function FeedbackManagement({
                 const isResolved = feedback.status === "已解决";
                 return (
                   <tr key={feedback.id} className="border-b hover:bg-gray-50/50 transition-colors">
-                    <td className="px-4 py-3 text-gray-500 w-32">#{String(feedback.id).slice(-6)}</td>
                     <td className="px-4 py-3 w-28">
                         <Badge variant="outline" className={getTypeColor(feedback.type) + " rounded-none pointer-events-auto"}>
                             <span className="ml-1">{feedback.type}</span>
@@ -227,14 +240,23 @@ export default function FeedbackManagement({
                         <span className="ml-1">{feedback.status}</span>
                       </Badge>
                     </td>
+                    {/* 新增“查看详情”列 */}
+                    <td className="px-4 py-3 w-28">
+                      <Button
+                        size="sm"
+                        onClick={() => openDetailsDialog(feedback)}
+                        className="text-blue-600 hover:text-blue-600 font-normal bg-transparent shadow-none border-none hover:bg-transparent focus:bg-transparent"
+                      >
+                        查看详情
+                      </Button>
+                    </td>
                     <td className="px-4 py-3 w-24">
                       <Button
                         variant="outline"
                         size="sm"
                         onClick={() => {
                           if (!isResolved) {
-                            setSelectedFeedback(feedback);
-                            setShowDetailsDialog(true);
+                            openActionDialog(feedback);
                           }
                         }}
                         disabled={isResolved}
@@ -283,7 +305,7 @@ export default function FeedbackManagement({
         </div>
       </div>
 
-      {/* 详情对话框 */}
+      {/* 详情对话框（只读） */}
       <Dialog open={showDetailsDialog} onOpenChange={setShowDetailsDialog}>
         <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto rounded-none">
           <DialogHeader>
@@ -324,45 +346,115 @@ export default function FeedbackManagement({
               </div>
               <div>
                 <Label>反馈内容</Label>
-                <div className="mt-1 p-3 bg-gray-50 rounded-none">
+                {/* 设置最大高度，超出时滚动，保证弹窗美观 */}
+                <div className="mt-1 p-3 bg-gray-50 rounded-none min-h-[48px] max-h-48 overflow-auto">
+                  <p className="text-sm whitespace-pre-wrap">{selectedFeedback.content}</p>
+                </div>
+              </div>
+              <div>
+                <Label>处理结果</Label>
+                <div className="mt-1 p-3 bg-gray-50 rounded-none min-h-[40px]">
+                  <span className="text-sm text-gray-800">
+                    {selectedFeedback.resolution || <span className="text-gray-400">暂无</span>}
+                  </span>
+                </div>
+              </div>
+              <div>
+                <Label>负责团队</Label>
+                <div className="mt-1 p-3 bg-gray-50 rounded-none min-h-[40px]">
+                  <span className="text-sm text-gray-800">
+                    {selectedFeedback.responsible_team || <span className="text-gray-400">未指定</span>}
+                  </span>
+                </div>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* 操作对话框（可编辑） */}
+      <Dialog open={showActionDialog} onOpenChange={setShowActionDialog}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto rounded-none">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              反馈处理 - #{selectedFeedback ? String(selectedFeedback.id).slice(-6) : ""}
+            </DialogTitle>
+          </DialogHeader>
+          {selectedFeedback && (
+            <div className="space-y-4">
+              <div className="grid gap-4 md:grid-cols-2">
+                <div>
+                  <Label>反馈类型</Label>
+                  <div className="mt-1">
+                    <Badge className={getTypeColor(selectedFeedback.type) + " rounded-none"}>
+                      {selectedFeedback.type}
+                    </Badge>
+                  </div>
+                </div>
+                <div>
+                  <Label>当前状态</Label>
+                  <div className="mt-1">
+                    <Badge variant="outline" className={getStatusColor(selectedFeedback.status) + " rounded-none"}>
+                      {getStatusIcon(selectedFeedback.status)}
+                      <span className="ml-1">{selectedFeedback.status}</span>
+                    </Badge>
+                  </div>
+                </div>
+                <div>
+                  <Label>提交人</Label>
+                  <p className="mt-1 text-sm">{selectedFeedback.created_by?.split('@')[0] || '匿名用户'}</p>
+                </div>
+                <div>
+                  <Label>提交时间</Label>
+                  <p className="mt-1 text-sm">
+                    {format(new Date(selectedFeedback.created_date), 'yyyy-MM-dd HH:mm:ss', { locale: zhCN })}
+                  </p>
+                </div>
+              </div>
+              <div>
+                <Label>反馈内容</Label>
+                <div className="mt-1 p-3 bg-gray-50 rounded-none min-h-[48px] max-h-48 overflow-auto">
                   <p className="text-sm whitespace-pre-wrap">{selectedFeedback.content}</p>
                 </div>
               </div>
               <div>
                 <Label>处理结果</Label>
                 <Textarea
+                  className="mt-1 bg-white rounded-none min-h-[40px] text-sm"
                   value={resolution}
-                  onChange={(e) => setResolution(e.target.value)}
-                  placeholder="填写处理结果和解决方案..."
-                  rows={4}
-                  className="mt-1 rounded-none"
+                  onChange={e => setResolution(e.target.value)}
+                  placeholder="请输入处理结果"
                 />
               </div>
-              {/* 新增：负责团队输入框 */}
               <div>
                 <Label>负责团队</Label>
                 <Input
+                  className="mt-1 bg-white rounded-none min-h-[40px] text-sm"
                   value={responsibleTeam}
-                  onChange={(e) => setResponsibleTeam(e.target.value)}
-                  placeholder="如：产品团队"
-                  className="mt-1 rounded-none"
+                  onChange={e => setResponsibleTeam(e.target.value)}
+                  placeholder="请输入负责团队"
                 />
               </div>
-
-              <div className="flex justify-end gap-2">
-                <Button variant="outline" onClick={() => setShowDetailsDialog(false)}>
+              {/* 操作按钮 */}
+              <div className="flex justify-end gap-3 pt-2">
+                <Button
+                  variant="outline"
+                  className="border-gray-300 text-gray-700 bg-white hover:bg-gray-50"
+                  onClick={() => setShowActionDialog(false)}
+                >
                   取消
                 </Button>
                 <Button
+                  variant="default"
+                  className="bg-blue-600 hover:bg-blue-700 text-white"
                   onClick={() => handleUpdateStatus(selectedFeedback.id, "处理中")}
-                  variant="outline"
-                  disabled={selectedFeedback.status !== "待处理"}
                 >
                   标记为处理中
                 </Button>
                 <Button
+                  variant="default"
+                  className="bg-blue-600 hover:bg-blue-700 text-white"
                   onClick={() => handleUpdateStatus(selectedFeedback.id, "已解决")}
-                  className="bg-green-600 hover:bg-green-700"
                 >
                   标记为已解决
                 </Button>
