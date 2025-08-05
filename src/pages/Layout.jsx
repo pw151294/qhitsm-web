@@ -18,7 +18,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 
-// 新的导航结构，经验分享与案例学习和反馈与建议收集均有子菜单
+// 新的导航结构，社区化运营支撑无children
 const navigationItems = [
   {
     title: "经验分享与案例学习",
@@ -55,13 +55,6 @@ const navigationItems = [
   {
     title: "社区化运营支撑",
     url: createPageUrl("Community"),
-    children: [
-      {
-        title: "用户成长",
-        url: "/Community?tab=growth",
-        tab: "growth",
-      },
-    ],
   },
 ];
 
@@ -79,20 +72,13 @@ export default function Layout({ children }) {
     location.pathname.startsWith("/Feedback")
   );
   // 折叠状态：社区化运营支撑菜单
-  const [communityOpen, setCommunityOpen] = useState(() =>
-    location.pathname.startsWith("/Community")
-  );
-  // 移动端折叠
+// 移动端折叠
   const [expOpenMobile, setExpOpenMobile] = useState(() =>
     location.pathname.startsWith("/Experience")
   );
   const [fbOpenMobile, setFbOpenMobile] = useState(() =>
     location.pathname.startsWith("/Feedback")
   );
-  const [communityOpenMobile, setCommunityOpenMobile] = useState(() =>
-    location.pathname.startsWith("/Community")
-  );
-
   React.useEffect(() => {
     loadUser();
   }, []);
@@ -142,14 +128,13 @@ export default function Layout({ children }) {
     return m ? m[1] : "quick";
   }, [location.search, isFeedbackActive]);
   // 当前community tab参数
-  const currentCommunityTab = useMemo(() => {
+  useMemo(() => {
     // 只在社区化运营支撑页面下才解析tab
     if (!isCommunityActive) return "";
     const m = location.search.match(/tab=(\w+)/);
     return m ? m[1] : "growth";
   }, [location.search, isCommunityActive]);
-
-  // 左侧纵向导航
+// 左侧纵向导航
   const NavigationMenu = ({ isMobile = false, onClickNav }) => (
     <nav className={`flex flex-col space-y-2`}>
       {/* 经验分享与案例学习（带折叠） */}
@@ -256,57 +241,21 @@ export default function Layout({ children }) {
           ))}
         </div>
       </div>
-      {/* 社区化运营支撑（带折叠） */}
+      {/* 社区化运营支撑（无折叠，直接跳转） */}
       <div>
-        <button
+        <Link
+          to={navigationItems[2].url}
+          onClick={onClickNav}
           className={`group flex items-center w-full px-4 py-3 rounded-lg transition-all duration-200
-            ${
-              isCommunityActive
-                ? 'text-gray-900'
-                : 'text-gray-700'
-            }`}
+            ${isCommunityActive ? 'bg-[color:var(--blue-6)] text-white' : 'text-gray-700'}
+          `}
           style={{
             fontWeight: 400,
             fontSize: "1rem"
           }}
-          // 移除 onMouseEnter/onMouseLeave 以取消 hover 背景
-          onClick={() => isMobile ? setCommunityOpenMobile(v => !v) : setCommunityOpen(v => !v)}
         >
           <span className="truncate">社区化运营支撑</span>
-          {(isMobile ? communityOpenMobile : communityOpen)
-            ? <ChevronDown className="ml-auto w-4 h-4" />
-            : <ChevronRight className="ml-auto w-4 h-4" />}
-        </button>
-        <div
-          className={`transition-all overflow-hidden
-            ${isMobile
-              ? communityOpenMobile ? "max-h-56 opacity-100" : "max-h-0 opacity-0"
-              : communityOpen ? "max-h-56 opacity-100" : "max-h-0 opacity-0"
-            }`}
-          style={{ transition: "all 0.2s" }}
-        >
-          {navigationItems[2].children.map((child) => (
-            <Link
-              key={child.title}
-              to={child.url}
-              onClick={onClickNav}
-              className={`block py-2 px-4 w-full rounded-lg transition-all duration-200
-                ${isCommunityActive && currentCommunityTab === child.tab
-                  ? 'bg-[color:var(--blue-6)] text-white'
-                  : 'text-gray-600'
-                }`}
-              style={{
-                fontWeight: 400,
-                fontSize: "1rem",
-                textAlign: "left",
-                paddingLeft: "2.5rem"
-              }}
-              // 移除 onMouseEnter/onMouseLeave 以取消 hover 背景
-            >
-              {child.title}
-            </Link>
-          ))}
-        </div>
+        </Link>
       </div>
     </nav>
   );

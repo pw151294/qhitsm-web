@@ -289,7 +289,14 @@ export default function MaintenanceCalendar({events, isLoading, onRefresh, onLoa
                                         <Button variant="outline" onClick={() => setShowCreateDialog(false)}>
                                             取消
                                         </Button>
-                                        <Button onClick={handleCreateEvent}>
+                                        <Button
+                                            style={{
+                                                backgroundColor: "#1f69ff",
+                                                color: "#fff",
+                                                border: "none"
+                                            }}
+                                            onClick={handleCreateEvent}
+                                        >
                                             创建活动
                                         </Button>
                                     </div>
@@ -475,7 +482,15 @@ export default function MaintenanceCalendar({events, isLoading, onRefresh, onLoa
                                 <Button variant="outline" onClick={() => setShowEventDialog(false)} className="rounded-none">
                                     关闭
                                 </Button>
-                                <Button className="bg-purple-600 hover:bg-purple-700 rounded-none">
+                                <Button
+                                    className="rounded-none"
+                                    style={{
+                                        backgroundColor: selectedEvent?.status === "报名中" ? "#1f69ff" : "#d1d5db",
+                                        color: selectedEvent?.status === "报名中" ? "#fff" : "#888",
+                                        border: "none"
+                                    }}
+                                    disabled={selectedEvent?.status !== "报名中"}
+                                >
                                     报名参加
                                 </Button>
                             </div>

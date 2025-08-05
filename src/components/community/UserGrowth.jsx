@@ -102,22 +102,14 @@ export default function UserGrowth({ users, isLoading }) {
             </div>
             {/* 个人信息居中 */}
             <div className="text-center mb-4">
-              <div className="relative w-20 h-20 mx-auto mb-2">
+              <div className="w-20 h-20 mx-auto mb-2">
                 <img
                   src={currentUser.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser.full_name || '用户')}&background=8b5cf6&color=fff&size=80`}
                   alt="用户头像"
-                  className="w-20 h-20 mx-auto object-cover border-4 border-white shadow rounded-none"
+                  className="w-20 h-20 mx-auto object-cover border-4 border-white shadow rounded-full"
                 />
-                {/* 等级徽章覆盖头像右下 */}
-                <div className="absolute -bottom-2 right-0">
-                  <Badge
-                    className={`${levelInfo.color} bg-white border-2 px-3 py-1 shadow text-base font-bold rounded-none`}
-                    style={{ background: "white" }} // 防止hover变色
-                  >
-                    L{userLevel}
-                  </Badge>
-                </div>
               </div>
+              {/* 等级徽章已移除 */}
               <div className="font-bold text-gray-800 text-lg">{currentUser.full_name || '用户'}</div>
               <div className="flex items-center justify-center mt-2 gap-2">
                 <Badge

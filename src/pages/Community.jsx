@@ -1,6 +1,5 @@
 import React, { useEffect, useRef } from "react";
 import UserGrowth from "../components/community/UserGrowth";
-// import InstantMessaging from "../components/community/InstantMessaging";
 import MaintenanceCalendar from "../components/community/MaintenanceCalendar";
 import { Event, User } from "@/api/entities";
 
@@ -49,10 +48,10 @@ export default function Community() {
     return (
         <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 p-4 md:p-8">
             <div className="max-w-7xl mx-auto">
-                {/* 只显示成长中心页头 */}
+                {/* 只显示社区化运营支撑页头 */}
                 <div className="mb-8">
                     <h1 className="text-3xl md:text-4xl font-bold text-black mb-2">
-                        用户成长中心
+                        社区化运营支撑
                     </h1>
                 </div>
                 <div className="mt-6">
